@@ -12,6 +12,7 @@ function App() {
   const [lon, setLon] = useState(-122.21);
   const [lat, setLat] = useState(47.59);
   const [zoom, setZoom] = useState(10);
+  const [pitch, setPitch] = useState(77);
 
   useEffect(() => {
     if (map.current) return; // initialize the map only once
@@ -22,7 +23,7 @@ function App() {
       style: "mapbox://styles/mapbox/streets-v12",
       center: [lon, lat],
       zoom: zoom,
-      pitch: 77,
+      pitch: pitch,
       bearing: 135,
     });
 
@@ -72,16 +73,17 @@ function App() {
   useEffect(() => {
     if (!map.current) return; // wait for map to initialize
     map.current.on("move", () => {
-      setLon(map.current.getCenter().lng.toFixed(4));
-      setLat(map.current.getCenter().lat.toFixed(4));
+      setLon(map.current.getCenter().lng.toFixed(2));
+      setLat(map.current.getCenter().lat.toFixed(2));
       setZoom(map.current.getZoom().toFixed(2));
+      setPitch(map.current.getPitch().toFixed(2));
     });
   })
 
   return (
     <div className="App">
       <div className="sidebar">
-        Longitude: {lon} | Latitude: {lat} | Zoom: {zoom}
+        Longitude: {lon} | Latitude: {lat} | Zoom: {zoom} | Pitch: {pitch}
       </div>
       <div ref={mapContainer} className="map-container" />
     </div>
