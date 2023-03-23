@@ -9,10 +9,11 @@ mapboxgl.accessToken = token;
 function App() {
   const mapContainer = useRef(null);
   const map = useRef(null);
-  const [lon, setLon] = useState(-122.21);
-  const [lat, setLat] = useState(47.59);
-  const [zoom, setZoom] = useState(10);
-  const [pitch, setPitch] = useState(77);
+  const [lon, setLon] = useState(-122.11);
+  const [lat, setLat] = useState(47.36);
+  const [zoom, setZoom] = useState(8.88);
+  const [pitch, setPitch] = useState(62.50);
+  const [bearing, setBearing] = useState(-64.50);
 
   useEffect(() => {
     if (map.current) return; // initialize the map only once
@@ -24,7 +25,7 @@ function App() {
       center: [lon, lat],
       zoom: zoom,
       pitch: pitch,
-      bearing: 135,
+      bearing: bearing,
     });
 
     map.current.on('style.load', () => {
@@ -34,7 +35,22 @@ function App() {
         'tileSize': 512,
         'maxzoom': 14
       });
-      map.current.setTerrain({'source': 'mapbox-dem', 'exaggeration': 5});
+      map.current.setTerrain({'source': 'mapbox-dem', 'exaggeration': 4});
+
+      setTimeout(()=> {
+        map.current.flyTo({
+          center: [-122.2685, 47.5505],
+          zoom: 11.73,
+          curve: 0.5,
+        });
+      }, 2000);
+
+      setTimeout(() => {
+        map.current.rotateTo(5, {
+          duration: 2000,
+          easing: (t) => t,
+        });
+      }, 5000);
     });
 
     // Add some Mapbox controls for the user for freeee
@@ -63,9 +79,9 @@ function App() {
         controls: {
           profileSwitcher: false
         },
-        exclude: "ferry",
+        // exclude: "ferry",
       }),
-      "bottom-right"
+      "top-left"
     );
   });
 
@@ -73,17 +89,19 @@ function App() {
   useEffect(() => {
     if (!map.current) return; // wait for map to initialize
     map.current.on("move", () => {
-      setLon(map.current.getCenter().lng.toFixed(2));
-      setLat(map.current.getCenter().lat.toFixed(2));
+      setLon(map.current.getCenter().lng.toFixed(4));
+      setLat(map.current.getCenter().lat.toFixed(4));
       setZoom(map.current.getZoom().toFixed(2));
       setPitch(map.current.getPitch().toFixed(2));
+      setBearing(map.current.getBearing().toFixed(2));
     });
   })
 
   return (
     <div className="App">
       <div className="sidebar">
-        Longitude: {lon} | Latitude: {lat} | Zoom: {zoom} | Pitch: {pitch}
+        Longitude: {lon} | Latitude: {lat}<br/>
+        Zoom: {zoom} | Pitch: {pitch} | Bearing: {bearing}
       </div>
       <div ref={mapContainer} className="map-container" />
     </div>
