@@ -1,6 +1,9 @@
 import mapboxgl from "mapbox-gl";
 import { useEffect, useRef, useState } from "react";
 import './App.css';
+// import bbox from "@turf/bbox";
+// import pointsWithinPolygon from "@turf/points-within-polygon";
+// import polygonize from "@turf/polygonize";
 
 // Vite .env file shenanigans
 const token = import.meta.env.VITE_MAPBOX_KEY;
