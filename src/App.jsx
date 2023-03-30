@@ -8,34 +8,54 @@ import circle from "@turf/circle";
 // import pointsWithinPolygon from "@turf/points-within-polygon";
 // import polygonize from "@turf/polygonize";
 
-// Vite .env file shenanigans
 const token = import.meta.env.VITE_MAPBOX_KEY;
 mapboxgl.accessToken = token;
 
-function doCameraAnimations(map) {
-  // This stuff will have to be a separate task as the intro landing experience
-  // setTimeout(()=> {
-  //   map.current.flyTo({
-  //     center: [-122.2685, 47.5505],
-  //     zoom: 11.73,
-  //     curve: 0.5,
-  //   });
-  // }, 2000);
+function timeout(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
 
-  // setTimeout(() => {
-  //   map.current.rotateTo(5, {
-  //     duration: 2000,
-  //     easing: (t) => t,
-  //   });
-  // }, 5000);
+async function zoomToCity(map) {
+  await timeout(3000);
+  map.current.flyTo({
+    center: [-122.2685, 47.5505],
+    zoom: 11.73,
+    curve: 0.5,
+  });
+}
 
-  // Users who have the cookie will execute this code instead
+async function rotateToBearing(map) {
+  await timeout(7000);
+  map.current.rotateTo(5, {
+    duration: 2000,
+    easing: (t) => t,
+  });
+}
+
+async function jumpToCity(map) {
+  await timeout(2000);
   map.current.jumpTo({
     center: [-122.2685, 47.5505],
     zoom: 11.73,
     curve: 0.5,
     bearing: 5
   });
+}
+
+async function doCameraAnimations(map) {
+  const firstTimeVisitor = true;
+  if (firstTimeVisitor) {
+    await Promise.all([
+      zoomToCity(map),
+      rotateToBearing(map),
+      timeout(10000)
+    ]);
+  } else {
+    // Users who have the cookie will execute this code instead
+    // On second thought, should probably just have them init the map zoomed in and forget the jumpTo call
+    await jumpToCity(map);
+    await timeout(5000);
+  }
 }
 
 function isRoundTrip() {
@@ -52,8 +72,8 @@ function getUserOrigin() {
   return [-122.3178, 47.6150]; // TODO: get this from user input
 }
 
-async function getIso() {
-  const testCoordinates = getUserOrigin();
+async function getIso(originCoordinates) {
+  const testCoordinates = originCoordinates;
   const testDuration = getUserDuration(isRoundTrip());
   const results = await fetchIsochrone(
     testCoordinates,
@@ -63,7 +83,7 @@ async function getIso() {
 }
 
 function pickCoordinate(contours) {
-  console.log('The contours returned', contours);
+  console.debug('The contours returned', contours);
   const targetContour = contours[0];
   const ringCoords = targetContour.geometry.coordinates;
 
@@ -118,7 +138,7 @@ async function getGeocoding(coordinate) {
       units:'miles'
     })
   );
-  console.log(`Bbox debugging: (${testBbox.join(',')})`);
+  console.debug(`Bbox debugging: (${testBbox.join(',')})`);
 
   const testProximity = coordinate;
   const results = await fetchGeocoding(
@@ -143,7 +163,8 @@ function pickAddress(pointsOfInterest) {
     return pointsOfInterest[0];
   }
 
-  const randomIndex = Math.floor(Math.random() * filtered.length - 1);
+  const randomIndex = Math.floor(Math.random() * (filtered.length - 1));
+  console.log('Randomly selecting element #', randomIndex, 'of this array', filtered);
   return filtered[randomIndex];
 }
 
@@ -159,17 +180,20 @@ function addPointsOfInterestToMap(map, pointsOfInterest) {
 
 async function doBehavior(map) {
   const directions = map.current._directions;
+  // const origin = directions.getOrigin().geometry.coordinates;
+  const origin = getUserOrigin();
+  console.debug('Origin point', origin); // LngLatLike
   directions.setOrigin(getUserOrigin());
-  addCoordinateToMap(map, getUserOrigin(), true);
+  addCoordinateToMap(map, origin, true);
 
-  const contours = await getIso();
+  const contours = await getIso(origin);
   const randomCoordinate = pickCoordinate(contours);
   addCoordinateToMap(map, randomCoordinate);
 
   const pointsOfInterest = await getGeocoding(randomCoordinate);
-  // console.log(pointsOfInterest);
+  console.debug('Geocoding results', pointsOfInterest);
   const randomAddress = pickAddress(pointsOfInterest);
-  console.log(randomAddress);
+  console.log('Selected address', randomAddress);
   addPointsOfInterestToMap(map, [randomAddress]);
 
   directions.setDestination(randomAddress.geometry.coordinates);
@@ -196,7 +220,7 @@ function App() {
       bearing: bearing,
     });
 
-    map.current.on('style.load', () => {
+    map.current.on('load', () => {
       map.current.addSource('mapbox-dem', {
         'type': 'raster-dem',
         'url': 'mapbox://mapbox.mapbox-terrain-dem-v1',
@@ -205,8 +229,9 @@ function App() {
       });
       map.current.setTerrain({'source': 'mapbox-dem', 'exaggeration': 4});
 
-      doCameraAnimations(map);
-      doBehavior(map);
+      doCameraAnimations(map).then(() => {
+        doBehavior(map);
+      });
     });
 
     map.current.addControl(new mapboxgl.NavigationControl({
