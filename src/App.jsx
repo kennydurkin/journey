@@ -30,7 +30,7 @@ function doCameraAnimations(map) {
   // }, 5000);
 
   // Users who have the cookie will execute this code instead
-  map.current.flyTo({
+  map.current.jumpTo({
     center: [-122.2685, 47.5505],
     zoom: 11.73,
     curve: 0.5,
@@ -43,7 +43,7 @@ function isRoundTrip() {
 }
 
 function getUserDuration(isRoundTrip = false) {
-  let duration = 30; // TODO: get this from user input
+  let duration = 30; // minutes, TODO: get this from user input
   if (isRoundTrip) duration /= 2;
   return Math.ceil(duration);
 }
@@ -92,14 +92,14 @@ function verifyCoordinate(coordinate) {
   return;
 }
 
-function addCoordinateToMap(map, randomCoordinate) {
-  const popUps = document.getElementsByClassName('mapboxgl-popup');
+function addCoordinateToMap(map, randomCoordinate, isOrigin = false) {
+  // const popUps = document.getElementsByClassName('mapboxgl-popup');
   /** Check if there is already a popup on the map and if so, remove it */
-  if (popUps[0]) popUps[0].remove();
+  // if (popUps[0]) popUps[0].remove();
 
   const popup = new mapboxgl.Popup({ closeOnClick: false })
       .setLngLat(randomCoordinate)
-      .setHTML(`<h3>Chosen Point</h3><i>${randomCoordinate.join(',')}</i>`)
+      .setHTML(`<h3>${isOrigin ? 'Origin' : 'Chosen'} Point</h3><i>${randomCoordinate.join(',')}</i>`)
       .addTo(map.current);
 }
 
@@ -126,30 +126,53 @@ async function getGeocoding(coordinate) {
     testBbox,
     testProximity,
   );
-  return results;
+  return results.features;
 }
 
 function pickAddress(pointsOfInterest) {
   // Step one: polygonize the contour LineStrings
   // Step two: use `mask` to treat the smaller LineString as a hole in the target LineString
   // Step three: filter the array to only those that pass pointsWithinPolygon
-  // If there were none that survived the filter....we can just return the first result for now
   // Step four: pick one at random if there are multiple left over
-  return;
+  const filtered = pointsOfInterest.filter(poi=> {
+    return true;
+  });
+
+  // If there were none that survived the filter....we can just return the first result for now
+  if (!filtered.length) {
+    return pointsOfInterest[0];
+  }
+
+  const randomIndex = Math.floor(Math.random() * filtered.length - 1);
+  return filtered[randomIndex];
+}
+
+function addPointsOfInterestToMap(map, pointsOfInterest) {
+  pointsOfInterest.forEach((poi) => {
+    const coords = poi.geometry.coordinates;
+    const popup = new mapboxgl.Popup({ closeOnClick: false })
+        .setLngLat(coords)
+        .setHTML(`<h3>${poi.text}</h3><i>${coords.join(',')}</i>`)
+        .addTo(map.current);
+  })
 }
 
 async function doBehavior(map) {
+  const directions = map.current._directions;
+  directions.setOrigin(getUserOrigin());
+  addCoordinateToMap(map, getUserOrigin(), true);
+
   const contours = await getIso();
   const randomCoordinate = pickCoordinate(contours);
   addCoordinateToMap(map, randomCoordinate);
 
   const pointsOfInterest = await getGeocoding(randomCoordinate);
-  console.log(pointsOfInterest.features);
-  // const randomAddress = pickAddress(pointsOfInterest)
-  // addPointsOfInterestToMap(map, pointsOfInterest);
+  // console.log(pointsOfInterest);
+  const randomAddress = pickAddress(pointsOfInterest);
+  console.log(randomAddress);
+  addPointsOfInterestToMap(map, [randomAddress]);
 
-  // const directions = getDirections(randomAddress);
-  // addDirectionsToMap(map, directions);
+  directions.setDestination(randomAddress.geometry.coordinates);
 }
 
 function App() {
@@ -164,7 +187,6 @@ function App() {
   useEffect(() => {
     if (map.current) return; // initialize the map only once
   
-    // MapboxGL Map object go brrrr
     map.current = new mapboxgl.Map({
       container: mapContainer.current,
       style: "mapbox://styles/mapbox/streets-v12",
@@ -202,19 +224,19 @@ function App() {
       })
     );
 
-    map.current.addControl(
-      new MapboxDirections({
-        flyTo: false,
-        profile: "mapbox/cycling",
-        alternatives: true,
-        accessToken: token,
-        controls: {
-          profileSwitcher: false
-        },
-        // exclude: "ferry",
-      }),
-      "top-left"
-    );
+    const directionsControl = new MapboxDirections({
+      flyTo: false,
+      profile: "mapbox/cycling",
+      alternatives: true,
+      accessToken: token,
+      interactive: false,
+      controls: {
+        profileSwitcher: false
+      },
+      // exclude: "ferry",
+    });
+    map.current.addControl(directionsControl, "top-left");
+    map.current._directions = directionsControl;
   });
 
   useEffect(() => {
