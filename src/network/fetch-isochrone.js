@@ -1,4 +1,3 @@
-// Vite .env file shenanigans
 const token = import.meta.env.VITE_MAPBOX_KEY;
 
 //https://api.mapbox.com/isochrone/v1/{profile}/{coordinates}?{contours_minutes|contours_meters}

@@ -1,13 +1,10 @@
 import { useEffect, useRef, useState } from "react";
 import mapboxgl from "mapbox-gl";
-import circle from "@turf/circle";
-import bbox from "@turf/bbox";
 // import polygonize from "@turf/polygonize";
 // import pointsWithinPolygon from "@turf/points-within-polygon";
-import fetchIsochrone from "../network/fetch-isochrone";
-import fetchGeocoding from "../network/fetch-geocoding";
 import { introAnimation } from "../animations/intro";
 import { timeout } from "../util/helpers";
+import Journey from "../journey";
 import './App.css';
 
 const token = import.meta.env.VITE_MAPBOX_KEY;
@@ -27,131 +24,45 @@ function getUserOrigin() {
   return [-122.3178, 47.6150]; // TODO: get this from user input
 }
 
-async function getIso(originCoordinates) {
-  const testCoordinates = originCoordinates;
-  const testDuration = getUserDuration(isRoundTrip());
-  const results = await fetchIsochrone(
-    testCoordinates,
-    testDuration
-  );
-  return results.features;
-}
-
-function pickCoordinate(contours) {
-  console.debug('The contours returned', contours);
-  const targetContour = contours[0];
-  const ringCoords = targetContour.geometry.coordinates;
-
-
-  const randomIndex = Math.floor(Math.random() * ringCoords.length-1);
-  let coordinate;
-  let candidate = ringCoords[randomIndex];
-
-  // while (!coordinate) {
-  //    const randomIndex = Math.floor(Math.random() * ringCoords.length-1);
-  //    verifyCoordinate(candidate) && coordinate = candidate
-  // }
-
-  // Remove this line once the above is implemented
-  coordinate = candidate;
-  return coordinate;
-}
-
-/**
- * TODO: implement two checks:
- *    - is greater than X meters away from next smallest linestring contour
- *    - square/circle around candidate points consists of at least Y% points within the target contour
- * @param {number[]} coordinate 
- */
-function verifyCoordinate(coordinate) {
-  return;
-}
-
-function addCoordinateToMap(map, randomCoordinate, isOrigin = false) {
-  // const popUps = document.getElementsByClassName('mapboxgl-popup');
-  /** Check if there is already a popup on the map and if so, remove it */
-  // if (popUps[0]) popUps[0].remove();
-
-  const popup = new mapboxgl.Popup({ closeOnClick: false })
-      .setLngLat(randomCoordinate)
-      .setHTML(`<h3>${isOrigin ? 'Origin' : 'Chosen'} Point</h3><i>${randomCoordinate.join(',')}</i>`)
-      .addTo(map.current);
-}
-
 function getUserQuery() {
   return 'coffee';
 }
 
-/**
- * @param {number[]} coordinate 
- * @returns number
- */
-async function getGeocoding(coordinate) {
-  const testQuery = getUserQuery();
-  const testBbox = bbox(
-    circle(coordinate, 1, {
-      units:'miles'
-    })
+function addCoordinateToMap(map, randomCoordinate, descriptor) {
+  const popup = new mapboxgl.Popup({ closeOnClick: false })
+      .setLngLat(randomCoordinate)
+      .setHTML(`<h3>${descriptor} Point</h3><i>${randomCoordinate.join(',')}</i>`)
+      .addTo(map.current);
+}
+
+// Useful method for debugging nearby locations
+// function addPointsOfInterestToMap(map, pointsOfInterest) {
+//   pointsOfInterest.forEach((poi) => {
+//     const coords = poi.geometry.coordinates;
+//     const popup = new mapboxgl.Popup({ closeOnClick: false })
+//         .setLngLat(coords)
+//         .setHTML(`<h3>${poi.text}</h3><i>${coords.join(',')}</i>`)
+//         .addTo(map.current);
+//   })
+// }
+
+async function createAndPlotRoute(map) {
+  // Journey instantiation
+  const journey = new Journey(
+    getUserOrigin(),
+    isRoundTrip(),
+    getUserDuration(),
+    getUserQuery()
   );
-  console.debug(`Bbox debugging: (${testBbox.join(',')})`);
-
-  const testProximity = coordinate;
-  const results = await fetchGeocoding(
-    testQuery,
-    testBbox,
-    testProximity,
-  );
-  return results.features;
-}
-
-function pickAddress(pointsOfInterest) {
-  // Step one: polygonize the contour LineStrings
-  // Step two: use `mask` to treat the smaller LineString as a hole in the target LineString
-  // Step three: filter the array to only those that pass pointsWithinPolygon
-  // Step four: pick one at random if there are multiple left over
-  const filtered = pointsOfInterest.filter(poi=> {
-    return true;
-  });
-
-  // If there were none that survived the filter....we can just return the first result for now
-  if (!filtered.length) {
-    return pointsOfInterest[0];
-  }
-
-  const randomIndex = Math.floor(Math.random() * (filtered.length - 1));
-  console.log('Randomly selecting element #', randomIndex, 'of this array', filtered);
-  return filtered[randomIndex];
-}
-
-function addPointsOfInterestToMap(map, pointsOfInterest) {
-  pointsOfInterest.forEach((poi) => {
-    const coords = poi.geometry.coordinates;
-    const popup = new mapboxgl.Popup({ closeOnClick: false })
-        .setLngLat(coords)
-        .setHTML(`<h3>${poi.text}</h3><i>${coords.join(',')}</i>`)
-        .addTo(map.current);
-  })
-}
-
-async function doBehavior(map) {
-  const directions = map.current._directions;
-  // const origin = directions.getOrigin().geometry.coordinates;
-  const origin = getUserOrigin();
-  console.debug('Origin point', origin); // LngLatLike
-  directions.setOrigin(getUserOrigin());
-  addCoordinateToMap(map, origin, true);
-
-  const contours = await getIso(origin);
-  const randomCoordinate = pickCoordinate(contours);
-  addCoordinateToMap(map, randomCoordinate);
-
-  const pointsOfInterest = await getGeocoding(randomCoordinate);
-  console.debug('Geocoding results', pointsOfInterest);
-  const randomAddress = pickAddress(pointsOfInterest);
-  console.log('Selected address', randomAddress);
-  addPointsOfInterestToMap(map, [randomAddress]);
-
-  directions.setDestination(randomAddress.geometry.coordinates);
+  await journey.generateJourney();
+  console.log(journey);
+  
+  // Map interfacing
+  addCoordinateToMap(map, journey.originPoint, 'Origin');
+  addCoordinateToMap(map, journey.bearingPoint, 'Bearing');
+  addCoordinateToMap(map, journey.destinationPoint, 'Destination');
+  map.current._directions.setOrigin(journey.originPoint);
+  map.current._directions.setDestination(journey.destinationPoint);
 }
 
 function App() {
@@ -222,11 +133,11 @@ function App() {
 
       if (isFirstTimeVisitor) {
         introAnimation(map).then(() => {
-          doBehavior(map);
+          createAndPlotRoute(map);
         });
       } else {
         timeout(2000).then(() => {
-          doBehavior(map);
+          createAndPlotRoute(map);
         });
       }
     });

@@ -1,4 +1,3 @@
-// Vite .env file shenanigans
 const token = import.meta.env.VITE_MAPBOX_KEY;
 
 //https://api.mapbox.com/geocoding/v5/{endpoint}/{search_text}.json
