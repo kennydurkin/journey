@@ -1,4 +1,4 @@
-import { timeout } from "../helpers";
+import { timeout } from "../util/helpers";
 
 async function zoomToCity(map) {
     await timeout(3000);

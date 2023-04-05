@@ -1,14 +1,14 @@
-import mapboxgl from "mapbox-gl";
 import { useEffect, useRef, useState } from "react";
-import './App.css';
-import fetchIsochrone from "./fetch-isochrone";
-import fetchGeocoding from "./fetch-geocoding";
-import bbox from "@turf/bbox";
+import mapboxgl from "mapbox-gl";
 import circle from "@turf/circle";
-import { introAnimation } from "./animations/intro";
-import { timeout } from "./helpers";
-// import pointsWithinPolygon from "@turf/points-within-polygon";
+import bbox from "@turf/bbox";
 // import polygonize from "@turf/polygonize";
+// import pointsWithinPolygon from "@turf/points-within-polygon";
+import fetchIsochrone from "../network/fetch-isochrone";
+import fetchGeocoding from "../network/fetch-geocoding";
+import { introAnimation } from "../animations/intro";
+import { timeout } from "../util/helpers";
+import './App.css';
 
 const token = import.meta.env.VITE_MAPBOX_KEY;
 mapboxgl.accessToken = token;
