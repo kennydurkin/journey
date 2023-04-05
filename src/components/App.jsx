@@ -3,21 +3,15 @@ import mapboxgl from "mapbox-gl";
 // import polygonize from "@turf/polygonize";
 // import pointsWithinPolygon from "@turf/points-within-polygon";
 import { introAnimation } from "../animations/intro";
-import { timeout } from "../util/helpers";
+import RoundTripCheckbox from "./RoundTrip";
 import Journey from "../journey";
 import './App.css';
 
 const token = import.meta.env.VITE_MAPBOX_KEY;
 mapboxgl.accessToken = token;
 
-function isRoundTrip() {
-  return false; // TODO: get this from user input
-}
-
 function getUserDuration(isRoundTrip = false) {
-  let duration = 30; // minutes, TODO: get this from user input
-  if (isRoundTrip) duration /= 2;
-  return Math.ceil(duration);
+  return 30;
 }
 
 function getUserOrigin() {
@@ -46,11 +40,11 @@ function addCoordinateToMap(map, randomCoordinate, descriptor) {
 //   })
 // }
 
-async function createAndPlotRoute(map) {
+async function createAndPlotRoute(map, isOneWay) {
   // Journey instantiation
   const journey = new Journey(
     getUserOrigin(),
-    isRoundTrip(),
+    isOneWay,
     getUserDuration(),
     getUserQuery()
   );
@@ -66,6 +60,9 @@ async function createAndPlotRoute(map) {
 }
 
 function App() {
+  const [isOneWay, setIsOneWay] = useState(true);
+  const handleCheckbox = () => { setIsOneWay(!isOneWay)};
+
   const isFirstTimeVisitor = false;
   const initialLon = isFirstTimeVisitor ? -122.11 : -122.2685;
   const initialLat = isFirstTimeVisitor ? 47.36 : 47.5505;
@@ -99,14 +96,6 @@ function App() {
       visualizePitch: true
     }));
     map.current.addControl(new mapboxgl.FullscreenControl());
-    map.current.addControl(
-      new mapboxgl.GeolocateControl({
-        positionOptions: {
-          enableHighAccuracy: true,
-        },
-        trackUserLocation: true,
-      })
-    );
 
     const directionsControl = new MapboxDirections({
       flyTo: false,
@@ -136,9 +125,10 @@ function App() {
           createAndPlotRoute(map);
         });
       } else {
-        timeout(2000).then(() => {
-          createAndPlotRoute(map);
-        });
+        // timeout(2000).then(() => {
+
+          // createAndPlotRoute(map);
+        // });
       }
     });
   });
@@ -157,8 +147,18 @@ function App() {
   return (
     <div className="App">
       <div className="sidebar">
-        Longitude: {lon} | Latitude: {lat}<br/>
-        Zoom: {zoom} | Pitch: {pitch} | Bearing: {bearing}
+        <div>Longitude: {lon} | Latitude: {lat}</div>
+        <div>Zoom: {zoom} | Pitch: {pitch} | Bearing: {bearing}</div>
+        <div className="journey-sidebar">
+          <div className="journey-inputs">
+            <RoundTripCheckbox label=" One way trip?" value={isOneWay} onChange={handleCheckbox}/>
+          </div>
+          <button onClick={() => {
+            createAndPlotRoute(map, isOneWay);
+          }}>
+            Click me!!
+          </button>
+        </div>
       </div>
       <div ref={mapContainer} className="map-container" />
     </div>

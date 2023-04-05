@@ -6,7 +6,7 @@ import bbox from "@turf/bbox";
 export default class Journey {
     // These get determined in the constructor
     originPoint; // [Lon, lat]
-    isRoundTrip; // true/false
+    isOneWay; // true/false
     idealDuration; // Number, in minutes
     idealRange; // Number, in minutes
     poiType; // String
@@ -18,14 +18,14 @@ export default class Journey {
     destinationPoi = []; // GeoJSON Feature
     destinationPoint = []; // [Lon, lat]
 
-    constructor(originPoint, isRoundTrip, idealDuration, poiType) {
+    constructor(originPoint, isOneWay, idealDuration, poiType) {
         this.originPoint = originPoint;
-        this.isRoundTrip = isRoundTrip;
+        this.isOneWay = isOneWay;
         this.idealDuration = idealDuration;
         this.poiType = poiType;
-        this.idealRange = this.isRoundTrip
-            ? this.idealDuration / 2
-            : this.idealDuration;
+        this.idealRange = this.isOneWay
+            ? this.idealDuration
+            : Math.ceil(this.idealDuration / 2);
     }
 
     // Generate a user journey!
