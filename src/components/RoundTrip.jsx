@@ -1,4 +1,4 @@
-const RoundTripCheckbox = ({label, value, onChange}) => {
+const RoundTripCheckbox = ({value, onChange}) => {
     return (
         <label>
             <input 
@@ -6,7 +6,7 @@ const RoundTripCheckbox = ({label, value, onChange}) => {
                 checked={value}
                 onChange={onChange}
             />
-            {label}
+            One way trip?
         </label>
     )
 }

@@ -3,16 +3,13 @@ import mapboxgl from "mapbox-gl";
 // import polygonize from "@turf/polygonize";
 // import pointsWithinPolygon from "@turf/points-within-polygon";
 import { introAnimation } from "../animations/intro";
+import DurationSlider from "./DurationSlider";
 import RoundTripCheckbox from "./RoundTrip";
 import Journey from "../journey";
 import './App.css';
 
 const token = import.meta.env.VITE_MAPBOX_KEY;
 mapboxgl.accessToken = token;
-
-function getUserDuration(isRoundTrip = false) {
-  return 30;
-}
 
 function getUserOrigin() {
   return [-122.3178, 47.6150]; // TODO: get this from user input
@@ -40,12 +37,12 @@ function addCoordinateToMap(map, randomCoordinate, descriptor) {
 //   })
 // }
 
-async function createAndPlotRoute(map, isOneWay) {
+async function createAndPlotRoute(map, isOneWay, duration) {
   // Journey instantiation
   const journey = new Journey(
     getUserOrigin(),
     isOneWay,
-    getUserDuration(),
+    parseInt(duration, 10),
     getUserQuery()
   );
   await journey.generateJourney();
@@ -62,6 +59,8 @@ async function createAndPlotRoute(map, isOneWay) {
 function App() {
   const [isOneWay, setIsOneWay] = useState(true);
   const handleCheckbox = () => { setIsOneWay(!isOneWay)};
+  const [duration, setDuration] = useState(30);
+  const handleSlider = (event) => { setDuration(event.target.value); };
 
   const isFirstTimeVisitor = false;
   const initialLon = isFirstTimeVisitor ? -122.11 : -122.2685;
@@ -103,10 +102,10 @@ function App() {
       alternatives: true,
       accessToken: token,
       interactive: false,
+      exclude: "ferry",
       controls: {
         profileSwitcher: false
       },
-      // exclude: "ferry",
     });
     map.current.addControl(directionsControl, "top-left");
     map.current._directions = directionsControl;
@@ -124,11 +123,6 @@ function App() {
         introAnimation(map).then(() => {
           createAndPlotRoute(map);
         });
-      } else {
-        // timeout(2000).then(() => {
-
-          // createAndPlotRoute(map);
-        // });
       }
     });
   });
@@ -149,12 +143,15 @@ function App() {
       <div className="sidebar">
         <div>Longitude: {lon} | Latitude: {lat}</div>
         <div>Zoom: {zoom} | Pitch: {pitch} | Bearing: {bearing}</div>
+        <br/>
         <div className="journey-sidebar">
           <div className="journey-inputs">
-            <RoundTripCheckbox label=" One way trip?" value={isOneWay} onChange={handleCheckbox}/>
+            <DurationSlider value={duration} onChange={handleSlider} /><br/>
+            <RoundTripCheckbox value={isOneWay} onChange={handleCheckbox}/>
           </div>
+          <br/>
           <button onClick={() => {
-            createAndPlotRoute(map, isOneWay);
+            createAndPlotRoute(map, isOneWay, duration);
           }}>
             Click me!!
           </button>
