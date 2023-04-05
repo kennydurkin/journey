@@ -5,40 +5,13 @@ import fetchIsochrone from "./fetch-isochrone";
 import fetchGeocoding from "./fetch-geocoding";
 import bbox from "@turf/bbox";
 import circle from "@turf/circle";
+import { introAnimation } from "./animations/intro";
+import { timeout } from "./helpers";
 // import pointsWithinPolygon from "@turf/points-within-polygon";
 // import polygonize from "@turf/polygonize";
 
 const token = import.meta.env.VITE_MAPBOX_KEY;
 mapboxgl.accessToken = token;
-
-function timeout(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
-
-async function zoomToCity(map) {
-  await timeout(3000);
-  map.current.flyTo({
-    center: [-122.2685, 47.5505],
-    zoom: 11.73,
-    curve: 0.5,
-  });
-}
-
-async function rotateToBearing(map) {
-  await timeout(7000);
-  map.current.rotateTo(5, {
-    duration: 2000,
-    easing: (t) => t,
-  });
-}
-
-async function doCameraAnimations(map) {
-  await Promise.all([
-    zoomToCity(map),
-    rotateToBearing(map),
-    timeout(10000)
-  ]);
-}
 
 function isRoundTrip() {
   return false; // TODO: get this from user input
@@ -194,7 +167,7 @@ function App() {
   const [lon, setLon] = useState(initialLon);
   const [lat, setLat] = useState(initialLat);
   const [zoom, setZoom] = useState(initialZoom);
-  const [pitch, setPitch] = useState(62.50);
+  const [pitch, setPitch] = useState(initialPitch);
   const [bearing, setBearing] = useState(initialBearing);
 
   useEffect(() => {
@@ -207,26 +180,6 @@ function App() {
       zoom: zoom,
       pitch: pitch,
       bearing: bearing,
-    });
-
-    map.current.on('load', () => {
-      map.current.addSource('mapbox-dem', {
-        'type': 'raster-dem',
-        'url': 'mapbox://mapbox.mapbox-terrain-dem-v1',
-        'tileSize': 512,
-        'maxzoom': 14
-      });
-      map.current.setTerrain({'source': 'mapbox-dem', 'exaggeration': 4});
-
-      if (isFirstTimeVisitor) {
-        doCameraAnimations(map).then(() => {
-          doBehavior(map);
-        });
-      } else {
-        timeout(2000).then(() => {
-          doBehavior(map);
-        });
-      }
     });
 
     map.current.addControl(new mapboxgl.NavigationControl({
@@ -257,6 +210,26 @@ function App() {
     });
     map.current.addControl(directionsControl, "top-left");
     map.current._directions = directionsControl;
+
+    map.current.on('load', () => {
+      map.current.addSource('mapbox-dem', {
+        'type': 'raster-dem',
+        'url': 'mapbox://mapbox.mapbox-terrain-dem-v1',
+        'tileSize': 512,
+        'maxzoom': 14
+      });
+      map.current.setTerrain({'source': 'mapbox-dem', 'exaggeration': 4});
+
+      if (isFirstTimeVisitor) {
+        introAnimation(map).then(() => {
+          doBehavior(map);
+        });
+      } else {
+        timeout(2000).then(() => {
+          doBehavior(map);
+        });
+      }
+    });
   });
 
   useEffect(() => {
