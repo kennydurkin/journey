@@ -32,30 +32,12 @@ async function rotateToBearing(map) {
   });
 }
 
-async function jumpToCity(map) {
-  await timeout(2000);
-  map.current.jumpTo({
-    center: [-122.2685, 47.5505],
-    zoom: 11.73,
-    curve: 0.5,
-    bearing: 5
-  });
-}
-
 async function doCameraAnimations(map) {
-  const firstTimeVisitor = true;
-  if (firstTimeVisitor) {
-    await Promise.all([
-      zoomToCity(map),
-      rotateToBearing(map),
-      timeout(10000)
-    ]);
-  } else {
-    // Users who have the cookie will execute this code instead
-    // On second thought, should probably just have them init the map zoomed in and forget the jumpTo call
-    await jumpToCity(map);
-    await timeout(5000);
-  }
+  await Promise.all([
+    zoomToCity(map),
+    rotateToBearing(map),
+    timeout(10000)
+  ]);
 }
 
 function isRoundTrip() {
@@ -200,13 +182,20 @@ async function doBehavior(map) {
 }
 
 function App() {
+  const isFirstTimeVisitor = false;
+  const initialLon = isFirstTimeVisitor ? -122.11 : -122.2685;
+  const initialLat = isFirstTimeVisitor ? 47.36 : 47.5505;
+  const initialZoom = isFirstTimeVisitor ? 8.88 : 11.73;
+  const initialPitch = 62.50;
+  const initialBearing = isFirstTimeVisitor ? -64.50 : 5.00;
+
   const mapContainer = useRef(null);
   const map = useRef(null);
-  const [lon, setLon] = useState(-122.11);
-  const [lat, setLat] = useState(47.36);
-  const [zoom, setZoom] = useState(8.88);
+  const [lon, setLon] = useState(initialLon);
+  const [lat, setLat] = useState(initialLat);
+  const [zoom, setZoom] = useState(initialZoom);
   const [pitch, setPitch] = useState(62.50);
-  const [bearing, setBearing] = useState(-64.50);
+  const [bearing, setBearing] = useState(initialBearing);
 
   useEffect(() => {
     if (map.current) return; // initialize the map only once
@@ -229,9 +218,15 @@ function App() {
       });
       map.current.setTerrain({'source': 'mapbox-dem', 'exaggeration': 4});
 
-      doCameraAnimations(map).then(() => {
-        doBehavior(map);
-      });
+      if (isFirstTimeVisitor) {
+        doCameraAnimations(map).then(() => {
+          doBehavior(map);
+        });
+      } else {
+        timeout(2000).then(() => {
+          doBehavior(map);
+        });
+      }
     });
 
     map.current.addControl(new mapboxgl.NavigationControl({
