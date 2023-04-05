@@ -12,15 +12,20 @@ import './App.css';
 const token = import.meta.env.VITE_MAPBOX_KEY;
 mapboxgl.accessToken = token;
 
-function getUserOrigin() {
-  return [-122.3178, 47.6150]; // TODO: get this from user input
-}
-
 function addCoordinateToMap(map, randomCoordinate, descriptor) {
   const popup = new mapboxgl.Popup({ closeOnClick: false })
       .setLngLat(randomCoordinate)
       .setHTML(`<h3>${descriptor} Point</h3><i>${randomCoordinate.join(',')}</i>`)
       .addTo(map.current);
+}
+
+// Cosmetic, though it'd be nice if there were a cleaner way to do this
+function toggleDestinationUI(shouldShow) {
+  const destination = document.querySelector('.mapbox-directions-destination')
+  destination.style.display = shouldShow ? 'block' : 'none';
+  const reverseSymbol = document.querySelector('.directions-icon-reverse')
+  reverseSymbol.style.display = shouldShow ? 'block' : 'none';
+
 }
 
 // Useful method for debugging nearby locations
@@ -36,8 +41,10 @@ function addCoordinateToMap(map, randomCoordinate, descriptor) {
 
 async function createAndPlotRoute(map, isOneWay, duration, destinationType) {
   // Journey instantiation
+  const directionsControl = map.current._directions;
+  const origin = directionsControl.getOrigin();
   const journey = new Journey(
-    getUserOrigin(),
+    origin.geometry.coordinates,
     isOneWay,
     parseInt(duration, 10),
     destinationType
@@ -49,8 +56,9 @@ async function createAndPlotRoute(map, isOneWay, duration, destinationType) {
   addCoordinateToMap(map, journey.originPoint, 'Origin');
   addCoordinateToMap(map, journey.bearingPoint, 'Bearing');
   addCoordinateToMap(map, journey.destinationPoint, 'Destination');
-  map.current._directions.setOrigin(journey.originPoint);
-  map.current._directions.setDestination(journey.destinationPoint);
+  directionsControl.setOrigin(journey.originPoint);
+  directionsControl.setDestination(journey.destinationPoint);
+  toggleDestinationUI(true);
 }
 
 function App() {
@@ -108,6 +116,7 @@ function App() {
     });
     map.current.addControl(directionsControl, "top-left");
     map.current._directions = directionsControl;
+    toggleDestinationUI(false);
 
     map.current.on('load', () => {
       map.current.addSource('mapbox-dem', {
@@ -145,7 +154,7 @@ function App() {
         <br/>
         <div className="journey-sidebar">
           <div className="journey-inputs">
-            <DestinationType value={destinationType} onChange={handleRadio} /><br/>
+            <DestinationType value={destinationType} onChange={handleRadio} />
             <DurationSlider value={duration} onChange={handleSlider} /><br/>
             <RoundTripCheckbox value={isOneWay} onChange={handleCheckbox}/>
           </div>
@@ -153,7 +162,7 @@ function App() {
           <button onClick={() => {
             createAndPlotRoute(map, isOneWay, duration, destinationType);
           }}>
-            Click me!!
+            Go on a journey!
           </button>
         </div>
       </div>
