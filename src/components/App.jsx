@@ -4,6 +4,7 @@ import mapboxgl from "mapbox-gl";
 // import pointsWithinPolygon from "@turf/points-within-polygon";
 import { introAnimation } from "../animations/intro";
 import DurationSlider from "./DurationSlider";
+import DestinationType from "./DestinationType";
 import RoundTripCheckbox from "./RoundTrip";
 import Journey from "../journey";
 import './App.css';
@@ -13,10 +14,6 @@ mapboxgl.accessToken = token;
 
 function getUserOrigin() {
   return [-122.3178, 47.6150]; // TODO: get this from user input
-}
-
-function getUserQuery() {
-  return 'coffee';
 }
 
 function addCoordinateToMap(map, randomCoordinate, descriptor) {
@@ -37,13 +34,13 @@ function addCoordinateToMap(map, randomCoordinate, descriptor) {
 //   })
 // }
 
-async function createAndPlotRoute(map, isOneWay, duration) {
+async function createAndPlotRoute(map, isOneWay, duration, destinationType) {
   // Journey instantiation
   const journey = new Journey(
     getUserOrigin(),
     isOneWay,
     parseInt(duration, 10),
-    getUserQuery()
+    destinationType
   );
   await journey.generateJourney();
   console.log(journey);
@@ -61,6 +58,8 @@ function App() {
   const handleCheckbox = () => { setIsOneWay(!isOneWay)};
   const [duration, setDuration] = useState(30);
   const handleSlider = (event) => { setDuration(event.target.value); };
+  const [destinationType, setDestinationType] = useState("coffee");
+  const handleRadio = (event) => { setDestinationType(event.target.value); };
 
   const isFirstTimeVisitor = false;
   const initialLon = isFirstTimeVisitor ? -122.11 : -122.2685;
@@ -146,12 +145,13 @@ function App() {
         <br/>
         <div className="journey-sidebar">
           <div className="journey-inputs">
+            <DestinationType value={destinationType} onChange={handleRadio} /><br/>
             <DurationSlider value={duration} onChange={handleSlider} /><br/>
             <RoundTripCheckbox value={isOneWay} onChange={handleCheckbox}/>
           </div>
           <br/>
           <button onClick={() => {
-            createAndPlotRoute(map, isOneWay, duration);
+            createAndPlotRoute(map, isOneWay, duration, destinationType);
           }}>
             Click me!!
           </button>
