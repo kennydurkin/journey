@@ -12,11 +12,14 @@ import './App.css';
 const token = import.meta.env.VITE_MAPBOX_KEY;
 mapboxgl.accessToken = token;
 
-function addCoordinateToMap(map, randomCoordinate, descriptor) {
+function addCoordinateToMap(map, randomCoordinate, descriptor, placeName) {
   const popup = new mapboxgl.Popup({ closeOnClick: false })
       .setLngLat(randomCoordinate)
-      .setHTML(`<h3>${descriptor} Point</h3><i>${randomCoordinate.join(',')}</i>`)
-      .addTo(map.current);
+      .setHTML(`
+        <h3>${descriptor} Point</h3>
+        ${placeName ? `<i>${placeName}</i>` : ''}
+        <i>${randomCoordinate.join(',')}</i>
+      `).addTo(map.current);
 }
 
 // Cosmetic, though it'd be nice if there were a cleaner way to do this
@@ -55,7 +58,7 @@ async function createAndPlotRoute(map, isOneWay, duration, destinationType) {
   // Map interfacing
   addCoordinateToMap(map, journey.originPoint, 'Origin');
   addCoordinateToMap(map, journey.bearingPoint, 'Bearing');
-  addCoordinateToMap(map, journey.destinationPoint, 'Destination');
+  addCoordinateToMap(map, journey.destinationPoint, 'Destination', journey.destinationPoi.place_name);
   directionsControl.setOrigin(journey.originPoint);
   directionsControl.setDestination(journey.destinationPoint);
   toggleDestinationUI(true);
@@ -96,12 +99,12 @@ function App() {
       bearing: bearing,
     });
 
+    map.current.addControl(new mapboxgl.FullscreenControl());
     map.current.addControl(new mapboxgl.NavigationControl({
       showCompass: true,
       showZoom: true,
       visualizePitch: true
     }));
-    map.current.addControl(new mapboxgl.FullscreenControl());
 
     const directionsControl = new MapboxDirections({
       flyTo: false,
@@ -160,6 +163,8 @@ function App() {
           </div>
           <br/>
           <button onClick={() => {
+            if(!Object.keys(map.current._directions.getOrigin()).length) return;
+            document.querySelectorAll('.mapboxgl-popup').forEach((el) => { el.remove() });
             createAndPlotRoute(map, isOneWay, duration, destinationType);
           }}>
             Go on a journey!
