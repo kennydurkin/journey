@@ -2,12 +2,13 @@ import { useEffect, useRef, useState } from "react";
 import mapboxgl from "mapbox-gl";
 // import polygonize from "@turf/polygonize";
 // import pointsWithinPolygon from "@turf/points-within-polygon";
+import addRingToMap from "../util/ring";
 import { introAnimation } from "../animations/intro";
 import DurationSlider from "./DurationSlider";
 import DestinationType from "./DestinationType";
 import RoundTripCheckbox from "./RoundTrip";
+import MenuButtons from "./MenuButtons";
 import Journey from "../journey";
-import addRingToMap from "../util/ring";
 import './App.css';
 
 const token = import.meta.env.VITE_MAPBOX_KEY;
@@ -117,6 +118,13 @@ function App() {
     });
     map.current.addControl(directionsControl, "top-left");
     map.current._directions = directionsControl;
+    map.current._directions.on('route', (e) => {
+      // Automatically hide the instructions once the "route" event fires
+      const selector = ".directions-control-directions";
+      const directionsEl = document.querySelector(selector);
+      if (!directionsEl) return;
+      directionsEl.style.opacity = 0;
+    });
     toggleDestinationUI(false);
 
     map.current.on('load', () => {
@@ -161,6 +169,7 @@ function App() {
           <button onClick={handleSubmit}>Go on a journey!</button>
         </div>
       </div>
+      <MenuButtons/>
       <div ref={mapContainer} className="map-container" />
     </div>
   )

@@ -3,6 +3,10 @@
   width: 100vw;
 }
 
+.directions-control-directions {
+  transition: opacity 1s;
+}
+
 .sidebar {
   background-color: rgba(35, 75, 40, 0.9);
   color: #fff;
