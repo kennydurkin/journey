@@ -15,4 +15,4 @@ const DirectionsToggle = () => {
     )
 }
 
-export default DirectionsToggle
+export default DirectionsToggle;

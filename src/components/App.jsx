@@ -2,75 +2,16 @@ import { useEffect, useRef, useState } from "react";
 import mapboxgl from "mapbox-gl";
 // import polygonize from "@turf/polygonize";
 // import pointsWithinPolygon from "@turf/points-within-polygon";
-import addRingToMap from "../util/ring";
 import { introAnimation } from "../animations/intro";
-import DurationSlider from "./DurationSlider";
-import DestinationType from "./DestinationType";
-import RoundTripCheckbox from "./RoundTrip";
+import { toggleDestinationUI } from "../util/helpers";
+import JourneyForm from "./JourneyForm";
 import MenuButtons from "./MenuButtons";
-import Journey from "../journey";
 import './App.css';
 
 const token = import.meta.env.VITE_MAPBOX_KEY;
 mapboxgl.accessToken = token;
 
-function addCoordinateToMap(map, randomCoordinate, descriptor, placeName) {
-  const popup = new mapboxgl.Popup({ closeOnClick: false })
-      .setLngLat(randomCoordinate)
-      .setHTML(`
-        <h3>${descriptor} Point</h3>
-        ${placeName ? `<i>${placeName}</i>` : ''}
-        <i>${randomCoordinate.join(',')}</i>
-      `).addTo(map.current);
-}
-
-// Cosmetic, though it'd be nice if there were a cleaner way to do this
-function toggleDestinationUI(shouldShow) {
-  const destination = document.querySelector('.mapbox-directions-destination')
-  destination.style.display = shouldShow ? 'block' : 'none';
-  const reverseSymbol = document.querySelector('.directions-icon-reverse')
-  reverseSymbol.style.display = shouldShow ? 'block' : 'none';
-}
-
-async function createAndPlotRoute(map, isOneWay, duration, destinationType) {
-  // Journey instantiation
-  const directionsControl = map.current._directions;
-  const origin = directionsControl.getOrigin();
-  const journey = new Journey(
-    origin.geometry.coordinates,
-    isOneWay,
-    parseInt(duration, 10),
-    destinationType
-  );
-  await journey.generateJourney();
-  console.log(journey);
-  
-  // Map interfacing
-  addCoordinateToMap(map, journey.originPoint, 'Origin');
-  addRingToMap(map, journey.contourRing);
-  addCoordinateToMap(map, journey.bearingPoint, 'Bearing');
-  addCoordinateToMap(map, journey.destinationPoint, 'Destination', journey.destinationPoi.place_name);
-  directionsControl.setOrigin(journey.originPoint);
-  directionsControl.setDestination(journey.destinationPoint);
-  toggleDestinationUI(true);
-}
-
 function App() {
-  const [isOneWay, setIsOneWay] = useState(true);
-  const handleCheckbox = () => { setIsOneWay(!isOneWay)};
-  const [duration, setDuration] = useState(30);
-  const handleSlider = (event) => { setDuration(event.target.value); };
-  const [destinationType, setDestinationType] = useState("coffee");
-  const handleRadio = (event) => { setDestinationType(event.target.value); };
-  const handleSubmit = (event) => {
-    if(!Object.keys(map.current._directions.getOrigin()).length) return;
-    map.current.getLayer('ring-background') && map.current.removeLayer('ring-background');
-    map.current.getLayer('ring-dashes') && map.current.removeLayer('ring-dashes');
-    map.current.getSource('ring-coords') && map.current.removeSource('ring-coords');
-    document.querySelectorAll('.mapboxgl-popup').forEach((el) => { el.remove() });
-    createAndPlotRoute(map, isOneWay, duration, destinationType);
-  }
-
   const isFirstTimeVisitor = false;
   const initialLon = isFirstTimeVisitor ? -122.11 : -122.2685;
   const initialLat = isFirstTimeVisitor ? 47.36 : 47.5505;
@@ -155,20 +96,11 @@ function App() {
 
   return (
     <div className="App">
-      <div className="sidebar">
+      {/* <div className="sidebar">
         <div>Longitude: {lon} | Latitude: {lat}</div>
         <div>Zoom: {zoom} | Pitch: {pitch} | Bearing: {bearing}</div>
-        <br/>
-        <div className="journey-sidebar">
-          <div className="journey-inputs">
-            <DestinationType value={destinationType} onChange={handleRadio} />
-            <DurationSlider value={duration} onChange={handleSlider} /><br/>
-            <RoundTripCheckbox value={isOneWay} onChange={handleCheckbox} duration={duration}/>
-          </div>
-          <br/>
-          <button onClick={handleSubmit}>Go on a journey!</button>
-        </div>
-      </div>
+      </div> */}
+      <JourneyForm map={map} />
       <MenuButtons/>
       <div ref={mapContainer} className="map-container" />
     </div>
