@@ -1,6 +1,12 @@
 import "./RoundTrip.css";
 
-const RoundTripCheckbox = ({value, onChange}) => {
+const toggleText = (duration, isOneWay) => {
+    const tripType = isOneWay ? 'One way' : 'Round trip'
+    const segmentDuration = isOneWay ? duration : duration / 2;
+    return `${tripType} (${segmentDuration}min to destination)`;
+}
+
+const RoundTripCheckbox = ({value, onChange, duration}) => {
     return (
         <div className="toggle">
             <input 
@@ -11,7 +17,7 @@ const RoundTripCheckbox = ({value, onChange}) => {
                 id="one-way-input"
             />
             <label className="toggle-label" for="one-way-input"/>
-            <p className="toggle-text">&nbsp;{ value ? "One way trip" : "Round trip"}</p>
+            <p className="toggle-text">&nbsp;{toggleText(duration, value)}</p>
         </div>
     )
 }

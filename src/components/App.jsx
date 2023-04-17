@@ -158,7 +158,7 @@ function App() {
           <div className="journey-inputs">
             <DestinationType value={destinationType} onChange={handleRadio} />
             <DurationSlider value={duration} onChange={handleSlider} /><br/>
-            <RoundTripCheckbox value={isOneWay} onChange={handleCheckbox}/>
+            <RoundTripCheckbox value={isOneWay} onChange={handleCheckbox} duration={duration}/>
           </div>
           <br/>
           <button onClick={() => {
