@@ -28,7 +28,6 @@ function toggleDestinationUI(shouldShow) {
   destination.style.display = shouldShow ? 'block' : 'none';
   const reverseSymbol = document.querySelector('.directions-icon-reverse')
   reverseSymbol.style.display = shouldShow ? 'block' : 'none';
-
 }
 
 // Useful method for debugging nearby locations
