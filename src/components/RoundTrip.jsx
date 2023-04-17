@@ -16,7 +16,7 @@ const RoundTripCheckbox = ({value, onChange, duration}) => {
                 className="toggle-input"
                 id="one-way-input"
             />
-            <label className="toggle-label" for="one-way-input"/>
+            <label className="toggle-label" htmlFor="one-way-input"/>
             <p className="toggle-text">&nbsp;{toggleText(duration, value)}</p>
         </div>
     )

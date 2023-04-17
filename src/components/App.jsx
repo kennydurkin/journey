@@ -7,6 +7,7 @@ import DurationSlider from "./DurationSlider";
 import DestinationType from "./DestinationType";
 import RoundTripCheckbox from "./RoundTrip";
 import Journey from "../journey";
+import addRingToMap from "../util/ring";
 import './App.css';
 
 const token = import.meta.env.VITE_MAPBOX_KEY;
@@ -30,17 +31,6 @@ function toggleDestinationUI(shouldShow) {
   reverseSymbol.style.display = shouldShow ? 'block' : 'none';
 }
 
-// Useful method for debugging nearby locations
-// function addPointsOfInterestToMap(map, pointsOfInterest) {
-//   pointsOfInterest.forEach((poi) => {
-//     const coords = poi.geometry.coordinates;
-//     const popup = new mapboxgl.Popup({ closeOnClick: false })
-//         .setLngLat(coords)
-//         .setHTML(`<h3>${poi.text}</h3><i>${coords.join(',')}</i>`)
-//         .addTo(map.current);
-//   })
-// }
-
 async function createAndPlotRoute(map, isOneWay, duration, destinationType) {
   // Journey instantiation
   const directionsControl = map.current._directions;
@@ -56,6 +46,7 @@ async function createAndPlotRoute(map, isOneWay, duration, destinationType) {
   
   // Map interfacing
   addCoordinateToMap(map, journey.originPoint, 'Origin');
+  addRingToMap(map, journey.contourRing);
   addCoordinateToMap(map, journey.bearingPoint, 'Bearing');
   addCoordinateToMap(map, journey.destinationPoint, 'Destination', journey.destinationPoi.place_name);
   directionsControl.setOrigin(journey.originPoint);
@@ -70,6 +61,14 @@ function App() {
   const handleSlider = (event) => { setDuration(event.target.value); };
   const [destinationType, setDestinationType] = useState("coffee");
   const handleRadio = (event) => { setDestinationType(event.target.value); };
+  const handleSubmit = (event) => {
+    if(!Object.keys(map.current._directions.getOrigin()).length) return;
+    map.current.getLayer('ring-background') && map.current.removeLayer('ring-background');
+    map.current.getLayer('ring-dashes') && map.current.removeLayer('ring-dashes');
+    map.current.getSource('ring-coords') && map.current.removeSource('ring-coords');
+    document.querySelectorAll('.mapboxgl-popup').forEach((el) => { el.remove() });
+    createAndPlotRoute(map, isOneWay, duration, destinationType);
+  }
 
   const isFirstTimeVisitor = false;
   const initialLon = isFirstTimeVisitor ? -122.11 : -122.2685;
@@ -130,9 +129,7 @@ function App() {
       map.current.setTerrain({'source': 'mapbox-dem', 'exaggeration': 4});
 
       if (isFirstTimeVisitor) {
-        introAnimation(map).then(() => {
-          createAndPlotRoute(map);
-        });
+        introAnimation(map);
       }
     });
   });
@@ -161,13 +158,7 @@ function App() {
             <RoundTripCheckbox value={isOneWay} onChange={handleCheckbox} duration={duration}/>
           </div>
           <br/>
-          <button onClick={() => {
-            if(!Object.keys(map.current._directions.getOrigin()).length) return;
-            document.querySelectorAll('.mapboxgl-popup').forEach((el) => { el.remove() });
-            createAndPlotRoute(map, isOneWay, duration, destinationType);
-          }}>
-            Go on a journey!
-          </button>
+          <button onClick={handleSubmit}>Go on a journey!</button>
         </div>
       </div>
       <div ref={mapContainer} className="map-container" />

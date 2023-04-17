@@ -31,6 +31,8 @@ export default class Journey {
     // Generate a user journey!
     async generateJourney() {
         this.contours = await this.getContours();
+        const targetContour = this.contours[0]; // TODO: grab the element with a properties.contour value of this.idealRange
+        this.contourRing = targetContour.geometry.coordinates;
         this.bearingPoint = this.pickCoordinate();
         this.pois = await this.getPois();
         this.destinationPoint = this.pickAddress();
