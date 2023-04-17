@@ -26,6 +26,7 @@ function App() {
   const [zoom, setZoom] = useState(initialZoom);
   const [pitch, setPitch] = useState(initialPitch);
   const [bearing, setBearing] = useState(initialBearing);
+  const [formVisibility, setFormVisibility] = useState(true);
 
   useEffect(() => {
     if (map.current) return; // initialize the map only once
@@ -64,7 +65,7 @@ function App() {
       const selector = ".directions-control-directions";
       const directionsEl = document.querySelector(selector);
       if (!directionsEl) return;
-      directionsEl.style.opacity = 0;
+      document.querySelector(selector).classList.add('m-fadeOut');
     });
     toggleDestinationUI(false);
 
@@ -100,8 +101,8 @@ function App() {
         <div>Longitude: {lon} | Latitude: {lat}</div>
         <div>Zoom: {zoom} | Pitch: {pitch} | Bearing: {bearing}</div>
       </div> */}
-      <JourneyForm map={map} />
-      <MenuButtons/>
+      <JourneyForm map={map} isVisible={formVisibility}/>
+      <MenuButtons isFormVisible={formVisibility} visibilityHook={setFormVisibility}/>
       <div ref={mapContainer} className="map-container" />
     </div>
   )

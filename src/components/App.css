@@ -3,19 +3,14 @@
   width: 100vw;
 }
 
-.directions-control-directions {
-  transition: opacity 1s;
+.m-fadeOut {
+  visibility: hidden;
+  opacity: 0;
+  transition: visibility 0s linear 300ms, opacity 300ms;
 }
 
-.journey-sidebar {
-  background-color: rgba(35, 75, 40, 0.9);
-  color: #fff;
-  padding: 6px 12px;
-  font-family: monospace;
-  z-index: 1;
-  position: absolute;
-  left: 0;
-  bottom: 1rem;
-  margin: 12px;
-  border-radius: 4px;
+.m-fadeIn {
+visibility: visible;
+opacity: 1;
+transition: visibility 0s linear 0s, opacity 300ms;
 }

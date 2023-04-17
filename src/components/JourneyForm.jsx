@@ -7,7 +7,7 @@ import DurationSlider from "./DurationSlider";
 import DestinationType from "./DestinationType";
 import RoundTripCheckbox from "./RoundTrip";
 import Journey from "../journey";
-import "./MenuButtons.css";
+import "./JourneyForm.css";
 
 async function createAndPlotRoute(map, isOneWay, duration, destinationType) {
   // Journey instantiation
@@ -32,7 +32,7 @@ async function createAndPlotRoute(map, isOneWay, duration, destinationType) {
   toggleDestinationUI(true);
 }
 
-const JourneyForm = ({map}) => {
+const JourneyForm = ({map, isVisible}) => {
   const [isOneWay, setIsOneWay] = useState(true);
   const handleCheckbox = () => { setIsOneWay(!isOneWay)};
   const [duration, setDuration] = useState(30);
@@ -52,14 +52,14 @@ const JourneyForm = ({map}) => {
   }
 
   return (
-    <div className="journey-sidebar">
+    <div className="journey-sidebar" style={{marginLeft: isVisible ? "5px" : "-300px"}}>
       <div className="journey-inputs">
         <DestinationType value={destinationType} onChange={handleRadio} />
         <DurationSlider value={duration} onChange={handleSlider} /><br/>
         <RoundTripCheckbox value={isOneWay} onChange={handleCheckbox} duration={duration}/>
       </div>
       <br/>
-      <button onClick={handleSubmit(map)}>Go on a journey!</button>
+      <button className="journey-button" onClick={handleSubmit(map)}>Go on a journey!</button>
     </div>
   )
 }
