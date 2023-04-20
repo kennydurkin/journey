@@ -59,7 +59,7 @@ const JourneyForm = ({map, isVisible}) => {
         <RoundTripCheckbox value={isOneWay} onChange={handleCheckbox} duration={duration}/>
       </div>
       <br/>
-      <button className="journey-button" onClick={handleSubmit(map)}>Go on a journey!</button>
+      <button className="journey-button" onClick={handleSubmit(map)}><p>Go on a journey!</p></button>
     </div>
   )
 }

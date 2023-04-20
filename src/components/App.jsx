@@ -13,7 +13,8 @@ mapboxgl.accessToken = token;
 
 function App() {
   const isFirstTimeVisitor = false;
-  const initialLon = isFirstTimeVisitor ? -122.11 : -122.2685;
+  // TODO: -122.2685 for desktop users once media queries start being added
+  const initialLon = isFirstTimeVisitor ? -122.11 : -122.3275;
   const initialLat = isFirstTimeVisitor ? 47.36 : 47.5505;
   const initialZoom = isFirstTimeVisitor ? 8.88 : 11.73;
   const initialPitch = 62.50;
