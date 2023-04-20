@@ -3,14 +3,16 @@
   width: 100vw;
 }
 
-.m-fadeOut {
+.directions-control.directions-control-directions.m-fadeOut {
   visibility: hidden;
   opacity: 0;
-  transition: visibility 0s linear 300ms, opacity 300ms;
+  margin-left: -300px;
+  transition: visibility 0s linear 300ms, opacity 300ms, margin-left 300ms;
 }
 
-.m-fadeIn {
+.directions-control.directions-control-directions.m-fadeIn {
 visibility: visible;
 opacity: 1;
-transition: visibility 0s linear 0s, opacity 300ms;
+margin-left: 0px;
+transition: visibility 0s linear 0s, opacity 300ms, margin-left 300ms;
 }

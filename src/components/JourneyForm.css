@@ -10,7 +10,7 @@
   margin: 0 0 5px 5px;
   border-radius: 4px;
   max-width: 300px;
-  transition: margin-left 0.5s;
+  transition: margin-left 300ms;
 }
 
 .journey-button {
