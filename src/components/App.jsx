@@ -21,11 +21,6 @@ function App() {
 
   const mapContainer = useRef(null);
   const map = useRef(null);
-  const [lon, setLon] = useState(initialLon);
-  const [lat, setLat] = useState(initialLat);
-  const [zoom, setZoom] = useState(initialZoom);
-  const [pitch, setPitch] = useState(initialPitch);
-  const [bearing, setBearing] = useState(initialBearing);
   const [formVisibility, setFormVisibility] = useState(true);
 
   useEffect(() => {
@@ -34,10 +29,11 @@ function App() {
     map.current = new mapboxgl.Map({
       container: mapContainer.current,
       style: "mapbox://styles/mapbox/streets-v12",
-      center: [lon, lat],
-      zoom: zoom,
-      pitch: pitch,
-      bearing: bearing,
+      center: [initialLon, initialLat],
+      zoom: initialZoom,
+      pitch: initialPitch,
+      bearing: initialBearing,
+      bearingSnap: 0
     });
 
     map.current.addControl(new mapboxgl.FullscreenControl());
@@ -84,25 +80,14 @@ function App() {
     });
   });
 
-  useEffect(() => {
-    if (!map.current) return; // wait for map to initialize
-    map.current.on("move", () => {
-      setLon(map.current.getCenter().lng.toFixed(4));
-      setLat(map.current.getCenter().lat.toFixed(4));
-      setZoom(map.current.getZoom().toFixed(2));
-      setPitch(map.current.getPitch().toFixed(2));
-      setBearing(map.current.getBearing().toFixed(2));
-    });
-  })
-
   return (
     <div className="App">
-      {/* <div className="sidebar">
-        <div>Longitude: {lon} | Latitude: {lat}</div>
-        <div>Zoom: {zoom} | Pitch: {pitch} | Bearing: {bearing}</div>
-      </div> */}
       <JourneyForm map={map} isVisible={formVisibility}/>
-      <MenuButtons isFormVisible={formVisibility} visibilityHook={setFormVisibility}/>
+      <MenuButtons
+        map={map}
+        isFormVisible={formVisibility}
+        visibilityHook={setFormVisibility}
+      />
       <div ref={mapContainer} className="map-container" />
     </div>
   )
