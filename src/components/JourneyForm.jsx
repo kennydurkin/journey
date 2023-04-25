@@ -20,7 +20,10 @@ async function createAndPlotRoute(map, isOneWay, duration, destinationType) {
     destinationType
   );
   await journey.generateJourney();
-  console.log(journey);
+
+  if (import.meta.env.DEV) {
+    console.log(journey);
+  }
   
   // Map interfacing
   addCoordinateToMap(map, journey.originPoint, 'Origin');

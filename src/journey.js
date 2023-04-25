@@ -53,7 +53,10 @@ export default class Journey {
             units:'miles'
             })
         );
-        console.debug(`Bbox debugging: (${testBbox.join(',')})`);
+
+        if (import.meta.env.DEV) {
+            console.debug(`Bbox debugging: (${testBbox.join(',')})`);
+        }
 
         const results = await fetchGeocoding(
             this.poiType,
