@@ -1,4 +1,3 @@
-import { useState } from "react"
 import "./AboutButton.css";
 
 const AboutPopup = () => {
@@ -13,17 +12,15 @@ const AboutPopup = () => {
     )
 }
 
-const AboutButton = ({formVisibilityHook}) => {
-    const [isAboutShowing, setShowAbout] = useState(false);
+const AboutButton = ({isAboutVisible, aboutHook}) => {
     const handleClick = () => {
-        setShowAbout(!isAboutShowing);
-        formVisibilityHook(isAboutShowing);
+        aboutHook(!isAboutVisible);
     }
 
     return (
         <div>
             <button className="menu-button" onClick={handleClick}>ℹ️</button>
-            {isAboutShowing && <AboutPopup/>}
+            {isAboutVisible && <AboutPopup/>}
         </div>
     )
 }

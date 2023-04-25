@@ -8,7 +8,7 @@ const DurationSlider = ({onChange, value}) => {
                 min="15"
                 max="60"
             />
-            &nbsp;{value} minute ride
+            &nbsp;~{value} minute ride
         </label>
     );
 }

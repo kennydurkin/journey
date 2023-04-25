@@ -3,12 +3,12 @@ import RotateToggle from "./RotateToggle";
 import FormToggle from "./FormToggle";
 import AboutButton from "./AboutButton";
 
-const MenuButtons = ({map, isFormVisible, visibilityHook}) => {
+const MenuButtons = ({map, isFormVisible, visibilityHook, isAboutVisible, aboutHook}) => {
     return (
         <div className="menu-buttons">
-            <FormToggle isFormVisible={isFormVisible} visibilityHook={visibilityHook} />
+            <FormToggle isFormVisible={isFormVisible} visibilityHook={visibilityHook}/>
             <RotateToggle map={map}/>
-            <AboutButton formVisibilityHook={visibilityHook}/>
+            <AboutButton isAboutVisible={isAboutVisible} aboutHook={aboutHook} />
         </div>
     )
 }

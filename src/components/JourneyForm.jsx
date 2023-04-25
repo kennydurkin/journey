@@ -54,7 +54,7 @@ function plotRoute(map, journey) {
   toggleDestinationUI(true);
 }
 
-const JourneyForm = ({map, isVisible}) => {
+const JourneyForm = ({map, isVisible, isAboutVisible}) => {
   const [isOneWay, setIsOneWay] = useState(true);
   const handleCheckbox = () => { setIsOneWay(!isOneWay)};
   const [duration, setDuration] = useState(30);
@@ -72,9 +72,9 @@ const JourneyForm = ({map, isVisible}) => {
 
     createAndPlotRoute(map, isOneWay, duration, destinationType);
   }
-
+  const visibilityClass = isVisible && !isAboutVisible ? '' : 'hide-journey-form';
   return (
-    <div className="journey-sidebar" style={{marginLeft: isVisible ? "5px" : "-300px"}}>
+    <div className={`journey-sidebar ${visibilityClass}`}>
       <div className="journey-inputs">
         <DestinationType value={destinationType} onChange={handleRadio} />
         <DurationSlider value={duration} onChange={handleSlider} /><br/>

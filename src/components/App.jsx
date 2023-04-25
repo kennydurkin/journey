@@ -25,7 +25,8 @@ function App() {
   const mapContainer = useRef(null);
   const map = useRef(null);
   const [formVisibility, setFormVisibility] = useState(true);
-  const [directionsVisibility, setDirectionsVisibility] = useState(false);
+  const [directionsLoaded, setAreDirectionsLoaded] = useState(false);
+  const [aboutVisibility, setAboutVisibility] = useState(false);
 
   useEffect(() => {
     if (map.current) return; // initialize the map only once
@@ -64,7 +65,6 @@ function App() {
       console.log('loading fired');
     })
     map.current._directions.on('route', (e) => {
-      console.log('route fired');
       // Automatically hide the instructions once the "route" event fires
       const selector = ".mapbox-directions-instructions";
       const directionsEl = document.querySelector(selector);
@@ -72,7 +72,7 @@ function App() {
 
       directionsEl.classList.add('m-fadeOut');
       directionsEl.classList.add('m-instructions');
-      setDirectionsVisibility(true);
+      setAreDirectionsLoaded(true);
     });
 
     toggleDestinationUI(false);
@@ -94,12 +94,14 @@ function App() {
 
   return (
     <div className="App">
-      <DirectionsToggle areDirectionsVisible={directionsVisibility}/>
-      <JourneyForm map={map} isVisible={formVisibility}/>
+      <DirectionsToggle areDirectionsLoaded={directionsLoaded} isAboutVisible={aboutVisibility}/>
+      <JourneyForm map={map} isVisible={formVisibility} isAboutVisible={aboutVisibility}/>
       <MenuButtons
         map={map}
         isFormVisible={formVisibility}
         visibilityHook={setFormVisibility}
+        isAboutVisible={aboutVisibility}
+        aboutHook={setAboutVisibility}
       />
       <div ref={mapContainer} className="map-container" />
     </div>

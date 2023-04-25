@@ -1,11 +1,10 @@
 .about-popup {
 	position: absolute;
-	left: 100px;
-	bottom: calc(50px + 10px + 10px); /* Menu btn + btn margin + container padding */
-	background-color: rgba(0,0,0,0.7);
+	right: 100px;
+	bottom: 0;
+	background-color: rgba(0,0,0,0.8);
 	border-radius: 10px;
 	width: 250px;
-	/* max-width: 300px; */
 	margin-bottom: 5px;
 	display: flex column;
 	padding: 10px;
