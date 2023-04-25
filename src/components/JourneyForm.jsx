@@ -10,9 +10,13 @@ import Journey from "../journey";
 import "./JourneyForm.css";
 
 async function createAndPlotRoute(map, isOneWay, duration, destinationType) {
+  const journey = await createRoute(map, isOneWay, duration, destinationType);
+  plotRoute(map, journey);
+}
+
+async function createRoute(map, isOneWay, duration, destinationType) {
   // Journey instantiation
-  const directionsControl = map.current._directions;
-  const origin = directionsControl.getOrigin();
+  const origin = map.current._directions.getOrigin();
   const journey = new Journey(
     origin.geometry.coordinates,
     isOneWay,
@@ -24,14 +28,29 @@ async function createAndPlotRoute(map, isOneWay, duration, destinationType) {
   if (import.meta.env.DEV) {
     console.log(journey);
   }
+
+  return journey;
+}
+
+function plotRoute(map, journey) {
+  if (import.meta.env.DEV) {
+    addCoordinateToMap(map, journey.originPoint, 'Origin Point');
+    addCoordinateToMap(map, journey.bearingPoint, 'Bearing Point');
+  }
   
-  // Map interfacing
-  addCoordinateToMap(map, journey.originPoint, 'Origin');
+  // Place name and full mailing address
+  const place = journey.destinationPoi.place_name;
+  // First entry from the array of context values
+  const neighborhood = journey.destinationPoi.context[0].text;
+  // Keep the name and street address, replace whitespace with '+' for URL input
+  const mapsQuery = place.split(',').slice(0,2).join(',').replaceAll(' ','+');
+  const mapsLink = `https://www.google.com/maps/search/${mapsQuery}`;
+  // Keeps the name only
+  const destinationShortName = place.split(',')[0];
+
   addRingToMap(map, journey.contourRing);
-  addCoordinateToMap(map, journey.bearingPoint, 'Bearing');
-  addCoordinateToMap(map, journey.destinationPoint, 'Destination', journey.destinationPoi.place_name);
-  directionsControl.setOrigin(journey.originPoint);
-  directionsControl.setDestination(journey.destinationPoint);
+  addCoordinateToMap(map, journey.destinationPoint, destinationShortName, neighborhood, mapsLink);
+  map.current._directions.setDestination(journey.destinationPoint);
   toggleDestinationUI(true);
 }
 
