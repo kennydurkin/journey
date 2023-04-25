@@ -17,4 +17,12 @@
   padding: 10px;
   border-radius: 10px;
   font-size: 20px;
+  color: rgb(35, 75, 40);
+}
+
+
+.radio-container {
+  display: flex;
+  justify-content: space-evenly;
+  font-size: 20px;
 }

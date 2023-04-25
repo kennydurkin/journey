@@ -1,0 +1,12 @@
+.directions-toggle {
+    display: none;
+    position: absolute;
+    top: 95px;
+    left: 120px;
+    z-index: 3;
+    font-size: 20px;
+    border-radius: 50px;
+    width: 32px;
+    height: 32px;
+    margin: 5px;
+}

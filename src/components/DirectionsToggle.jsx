@@ -1,6 +1,5 @@
-import "./DirectionsDiv.css";
-
-const DirectionsToggle = () => {
+import "./DirectionsToggle.css";
+const DirectionsToggle = ({areDirectionsVisible}) => {
     const handleClick = () => {
         const selector = ".mapbox-directions-instructions";
         const directionsEl = document.querySelector(selector);
@@ -22,7 +21,10 @@ const DirectionsToggle = () => {
     }
 
     return (
-        <button className="menu-button" onClick={handleClick}>⤴️</button>
+        <button
+            className={`directions-toggle ${areDirectionsVisible ? 'display-block' : ''}`}
+            onClick={handleClick}
+        >⤵️</button>
     )
 }
 

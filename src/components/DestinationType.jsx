@@ -1,6 +1,6 @@
 const DestinationType = ({onChange, value}) => {
     return (
-        <div>
+        <div className="radio-container">
             <label>
                 <input
                     type="radio"

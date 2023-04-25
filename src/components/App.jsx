@@ -4,9 +4,11 @@ import mapboxgl from "mapbox-gl";
 // import pointsWithinPolygon from "@turf/points-within-polygon";
 import { introAnimation } from "../animations/intro";
 import { toggleDestinationUI } from "../util/helpers";
+import DirectionsToggle from "./DirectionsToggle";
 import JourneyForm from "./JourneyForm";
 import MenuButtons from "./MenuButtons";
 import './App.css';
+import "./DirectionsDiv.css";
 
 const token = import.meta.env.VITE_MAPBOX_KEY;
 mapboxgl.accessToken = token;
@@ -23,6 +25,7 @@ function App() {
   const mapContainer = useRef(null);
   const map = useRef(null);
   const [formVisibility, setFormVisibility] = useState(true);
+  const [directionsVisibility, setDirectionsVisibility] = useState(false);
 
   useEffect(() => {
     if (map.current) return; // initialize the map only once
@@ -66,9 +69,12 @@ function App() {
       const selector = ".mapbox-directions-instructions";
       const directionsEl = document.querySelector(selector);
       if (!directionsEl) return;
+
       directionsEl.classList.add('m-fadeOut');
       directionsEl.classList.add('m-instructions');
+      setDirectionsVisibility(true);
     });
+
     toggleDestinationUI(false);
 
     map.current.on('load', () => {
@@ -88,6 +94,7 @@ function App() {
 
   return (
     <div className="App">
+      <DirectionsToggle areDirectionsVisible={directionsVisibility}/>
       <JourneyForm map={map} isVisible={formVisibility}/>
       <MenuButtons
         map={map}
