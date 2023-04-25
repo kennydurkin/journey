@@ -1,0 +1,33 @@
+/**
+ * Custom styles that let me overwrite and pertain to the directions div,
+ * which is part of the Mapbox Directions plugin.
+ */
+.m-fadeOut {
+    visibility: hidden;
+    opacity: 0;
+    margin-left: -300px;
+    transition: visibility 0s linear 300ms, opacity 300ms, margin-left 300ms;
+}
+
+.m-fadeIn {
+    visibility: visible;
+    opacity: 1;
+    margin-left: 0px;
+    transition: visibility 0s linear 0s, opacity 300ms, margin-left 300ms;
+}
+
+.m-instructions {
+    position: absolute;
+    top: 125px;
+    background: rgba(0,0,0,0.75);
+}
+
+@media only screen and (max-width: 640px) {
+    .mapbox-directions-multiple {
+        /*
+        When multiple routes are present, the route selector div gets a
+        min-height of 50px. Preventing that lets us do a constant 125px above for the instructions div.
+        */
+        min-height: initial;
+    }
+}

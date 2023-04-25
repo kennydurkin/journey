@@ -57,12 +57,17 @@ function App() {
     });
     map.current.addControl(directionsControl, "top-left");
     map.current._directions = directionsControl;
+    map.current._directions.on('loading', (e) => {
+      console.log('loading fired');
+    })
     map.current._directions.on('route', (e) => {
+      console.log('route fired');
       // Automatically hide the instructions once the "route" event fires
-      const selector = ".directions-control-directions";
+      const selector = ".mapbox-directions-instructions";
       const directionsEl = document.querySelector(selector);
       if (!directionsEl) return;
-      document.querySelector(selector).classList.add('m-fadeOut');
+      directionsEl.classList.add('m-fadeOut');
+      directionsEl.classList.add('m-instructions');
     });
     toggleDestinationUI(false);
 
