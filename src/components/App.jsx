@@ -61,6 +61,11 @@ function App() {
     });
     map.current.addControl(directionsControl, "bottom-left");
     map.current._directions = directionsControl;
+
+    /**
+     * Every time a route is calculated, hide the instructions so it doesn't obscure the page for mobile users
+     * A stateful toggle is presented to the user instead that will be in charge of displaying the instructions.
+     */
     map.current._directions.on('route', (e) => {
       // Automatically hide the instructions once the "route" event fires
       const selector = ".mapbox-directions-instructions";
@@ -70,6 +75,13 @@ function App() {
       directionsEl.classList.add('m-fadeOut');
       directionsEl.classList.add('m-instructions');
       setAreDirectionsLoaded(true);
+    });
+
+    /**
+     * Make sure that when an event is cleared that the custom directions toggle is hidden
+     */
+    map.current._directions.on('clear', (e) => {
+      setAreDirectionsLoaded(false);
     });
 
     /**
@@ -86,8 +98,9 @@ function App() {
       this.originalFitBounds(bounds, myOptions, eventData);
     };
 
-    // Hides the destination input field for now since it will be populated automatically
+    // Lets the plugin live toward the bottom of the page on first use, next to the input form
     initializePluginPosition();
+    // Hides the destination input field for now since it will be populated automatically
     toggleDestinationUI(false);
 
     map.current.on('load', () => {
