@@ -18,8 +18,8 @@ function App() {
   // TODO: -122.2685 for desktop users once media queries start being added
   const initialLon = isFirstTimeVisitor ? -122.11 : -122.3275;
   const initialLat = isFirstTimeVisitor ? 47.36 : 47.5505;
-  const initialZoom = isFirstTimeVisitor ? 8.88 : 11.73;
-  const initialPitch = 62.50;
+  const initialZoom = isFirstTimeVisitor ? 2.58 : 11.73;
+  const initialPitch = isFirstTimeVisitor ? 70.00 : 62.50;
   const initialBearing = isFirstTimeVisitor ? -64.50 : 5.00;
 
   const mapContainer = useRef(null);
@@ -82,7 +82,7 @@ function App() {
     mapboxgl.Map.prototype.originalFitBounds = mapboxgl.Map.prototype.fitBounds;
     // Basing this off the definition here https://docs.mapbox.com/mapbox-gl-js/api/map/#map#fitbounds
     mapboxgl.Map.prototype.fitBounds = function(bounds, options = {}, eventData = {}) {
-      const myOptions = {...options, pitch: this.getPitch(), zoom: this.getZoom};
+      const myOptions = {...options, pitch: this.getPitch()};
       this.originalFitBounds(bounds, myOptions, eventData);
     };
 
