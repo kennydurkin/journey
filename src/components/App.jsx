@@ -61,9 +61,6 @@ function App() {
     });
     map.current.addControl(directionsControl, "top-left");
     map.current._directions = directionsControl;
-    map.current._directions.on('loading', (e) => {
-      console.log('loading fired');
-    })
     map.current._directions.on('route', (e) => {
       // Automatically hide the instructions once the "route" event fires
       const selector = ".mapbox-directions-instructions";
@@ -75,6 +72,21 @@ function App() {
       setAreDirectionsLoaded(true);
     });
 
+    /**
+     * When the Directions plugin successfully sets a destination, it fits the route within a rectangular boundary.
+     * Sadly, the plugin allows pitch to default back to 0 degrees when it calls the "fitBounds" method to do this.
+     * Since an angulated pitch is a particular highlight of my app, I must override the method to prevent this.
+     *
+     * This is one of the glaring reasons why this app must stop leaning on the Directions plugin in the future.
+     */
+    mapboxgl.Map.prototype.originalFitBounds = mapboxgl.Map.prototype.fitBounds;
+    // Basing this off the definition here https://docs.mapbox.com/mapbox-gl-js/api/map/#map#fitbounds
+    mapboxgl.Map.prototype.fitBounds = function(bounds, options = {}, eventData = {}) {
+      const myOptions = {...options, pitch: this.getPitch(), zoom: this.getZoom};
+      this.originalFitBounds(bounds, myOptions, eventData);
+    };
+
+    // Hides the destination input field for now since it will be populated automatically
     toggleDestinationUI(false);
 
     map.current.on('load', () => {
