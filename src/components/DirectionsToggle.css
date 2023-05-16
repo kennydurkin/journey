@@ -1,12 +1,20 @@
 .directions-toggle {
     display: none;
     position: absolute;
-    top: 95px;
-    left: 120px;
+    top: 100px;
+    left: 130px;
     z-index: 3;
     font-size: 20px;
+    background-color: transparent;
+    border: solid 1px;
+    color: white;
     border-radius: 50px;
-    width: 32px;
-    height: 32px;
-    margin: 5px;
+    width: 30px;
+    height: 30px;
+    text-align: center;
+    transition: transform 0.2s;
+}
+
+.directions-icon-rotate {
+    transform: rotate(180deg);
 }

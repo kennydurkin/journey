@@ -47,9 +47,9 @@ const DirectionsToggle = ({areDirectionsLoaded, isAboutVisible}) => {
     const visibilityClass = areDirectionsLoaded ? 'display-block' : '';
     return (
         <button
-            className={`directions-toggle ${visibilityClass}`}
+            className={`directions-toggle ${visibilityClass} ${toggleIsHidingDirections ? "" : "directions-icon-rotate"}`}
             onClick={handleClick}
-        >⤵️</button>
+        >➜</button>
     )
 }
 
