@@ -3,7 +3,7 @@ import "./RoundTrip.css";
 const toggleText = (duration, isOneWay) => {
     const tripType = isOneWay ? 'One way' : 'Round trip'
     const segmentDuration = isOneWay ? duration : Math.ceil(duration / 2);
-    return `${tripType} (${segmentDuration}min to destination)`;
+    return `${tripType} (${segmentDuration}min each way)`;
 }
 
 const RoundTripCheckbox = ({value, onChange, duration}) => {

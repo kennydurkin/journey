@@ -2,6 +2,7 @@ import { useState } from "react";
 import { toggleDestinationUI } from "../util/helpers";
 import { addCoordinateToMap } from "../util/popups";
 import addRingToMap from "../util/ring";
+import { cleanupPluginPosition } from "../util/helpers";
 
 import DurationSlider from "./DurationSlider";
 import DestinationType from "./DestinationType";
@@ -48,7 +49,7 @@ function plotRoute(map, journey) {
   // Keeps the name only
   const destinationShortName = place.split(',')[0];
 
-  addRingToMap(map, journey.contourRing);
+  addRingToMap(map, journey.contourRing, "#8a8acb");
   addCoordinateToMap(map, journey.destinationPoint, destinationShortName, neighborhood, mapsLink);
   map.current._directions.setDestination(journey.destinationPoint);
   toggleDestinationUI(true);
@@ -64,6 +65,9 @@ const JourneyForm = ({map, isVisible, isAboutVisible}) => {
   const handleSubmit = (map) => (event) => {
     if(!Object.keys(map.current._directions.getOrigin()).length) return;
 
+    // Let the directions plugin go back to living at the top of the screen
+    cleanupPluginPosition();
+
     // Clean up any layers and popups we may have had on the map
     map.current.getLayer('ring-background') && map.current.removeLayer('ring-background');
     map.current.getLayer('ring-dashes') && map.current.removeLayer('ring-dashes');
@@ -77,7 +81,7 @@ const JourneyForm = ({map, isVisible, isAboutVisible}) => {
     <div className={`journey-sidebar ${visibilityClass}`}>
       <div className="journey-inputs">
         <DestinationType value={destinationType} onChange={handleRadio} />
-        <DurationSlider value={duration} onChange={handleSlider} /><br/>
+        <DurationSlider value={duration} onChange={handleSlider} />
         <RoundTripCheckbox value={isOneWay} onChange={handleCheckbox} duration={duration}/>
       </div>
       <br/>

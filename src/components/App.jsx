@@ -3,7 +3,7 @@ import mapboxgl from "mapbox-gl";
 // import polygonize from "@turf/polygonize";
 // import pointsWithinPolygon from "@turf/points-within-polygon";
 import { introAnimation } from "../animations/intro";
-import { toggleDestinationUI } from "../util/helpers";
+import { toggleDestinationUI, initializePluginPosition } from "../util/helpers";
 import DirectionsToggle from "./DirectionsToggle";
 import JourneyForm from "./JourneyForm";
 import MenuButtons from "./MenuButtons";
@@ -59,7 +59,7 @@ function App() {
         profileSwitcher: false
       },
     });
-    map.current.addControl(directionsControl, "top-left");
+    map.current.addControl(directionsControl, "bottom-left");
     map.current._directions = directionsControl;
     map.current._directions.on('route', (e) => {
       // Automatically hide the instructions once the "route" event fires
@@ -87,6 +87,7 @@ function App() {
     };
 
     // Hides the destination input field for now since it will be populated automatically
+    initializePluginPosition();
     toggleDestinationUI(false);
 
     map.current.on('load', () => {

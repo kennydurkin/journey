@@ -2,6 +2,13 @@
  * Custom styles that let me overwrite and pertain to the directions div,
  * which is part of the Mapbox Directions plugin.
  */
+.initial-plugin-position {
+    position: relative;
+    /* top: calc(100vh - 220px); */
+    bottom: 125px;
+    left: -5px;
+}
+
 .m-fadeOut {
     visibility: hidden;
     opacity: 0;
