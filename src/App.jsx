@@ -1,11 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import mapboxgl from "mapbox-gl";
-// import polygonize from "@turf/polygonize";
-// import pointsWithinPolygon from "@turf/points-within-polygon";
-import { introAnimation } from "../animations/intro";
-import DirectionsPlugin, { initializeDirectionsPlugin } from "./DirectionsPlugin";
-import JourneyForm from "./JourneyForm";
-import MenuButtons from "./MenuButtons";
+import { introAnimation } from "./animations/intro";
+import DirectionsPlugin, { initializeDirectionsPlugin } from "./components/DirectionsPlugin";
+import JourneyForm from "./components/JourneyForm";
+import MenuButtons from "./components/MenuButtons";
 import './App.css';
 
 const token = import.meta.env.VITE_MAPBOX_KEY;
