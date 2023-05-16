@@ -1,13 +1,13 @@
 import { useState } from "react";
-import { toggleDestinationUI } from "../util/helpers";
-import { addCoordinateToMap } from "../util/popups";
-import addRingToMap from "../util/ring";
-import { cleanupPluginPosition } from "../util/helpers";
+import { toggleDestinationUI } from "../../util/helpers";
+import { addCoordinateToMap } from "../../util/popups";
+import addRingToMap from "../../util/ring";
+import { cleanupPluginPosition } from "../../util/helpers";
+import Journey from "../../util/journey";
 
 import DurationSlider from "./DurationSlider";
 import DestinationType from "./DestinationType";
 import RoundTripCheckbox from "./RoundTrip";
-import Journey from "../util/journey";
 import "./JourneyForm.css";
 
 async function createAndPlotRoute(map, isOneWay, duration, destinationType) {

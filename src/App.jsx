@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import mapboxgl from "mapbox-gl";
 import { introAnimation } from "./animations/intro";
-import DirectionsPlugin, { initializeDirectionsPlugin } from "./components/DirectionsPlugin";
-import JourneyForm from "./components/JourneyForm";
-import MenuButtons from "./components/MenuButtons";
+import DirectionsPlugin, { initializeDirectionsPlugin } from "./components/directions/Plugin";
+import JourneyForm from "./components/form/JourneyForm";
+import MenuButtons from "./components/buttons/Menu";
 import './App.css';
 
 const token = import.meta.env.VITE_MAPBOX_KEY;

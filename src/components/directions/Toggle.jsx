@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import "./DirectionsToggle.css";
+import "./Toggle.css";
 
 const directionsSelector = ".mapbox-directions-instructions";
 const handleIfElementExists = (cb) => {

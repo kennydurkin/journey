@@ -1,7 +1,7 @@
 import mapboxgl from "mapbox-gl";
-import { toggleDestinationUI, initializePluginPosition } from "../util/helpers";
-import DirectionsToggle from "./DirectionsToggle";
-import "./DirectionsPlugin.css";
+import { toggleDestinationUI, initializePluginPosition } from "../../util/helpers";
+import DirectionsToggle from "./Toggle";
+import "./Plugin.css";
 
 export function initializeDirectionsPlugin(map, setAreDirectionsLoaded) {
     const directionsControl = new MapboxDirections({
