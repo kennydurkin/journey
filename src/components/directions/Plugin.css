@@ -3,9 +3,7 @@
  * which is part of the Mapbox Directions plugin.
  */
 .initial-plugin-position {
-    position: relative;
-    /* top: calc(100vh - 220px); */
-    bottom: 125px;
+    position: absolute;
     left: -5px;
 }
 

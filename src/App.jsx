@@ -37,7 +37,8 @@ function App() {
       bearingSnap: 0
     });
 
-    map.current.addControl(new mapboxgl.FullscreenControl());
+    // map.current.addControl(new mapboxgl.FullscreenControl());
+    map.current.addControl(new mapboxgl.GeolocateControl());
     map.current.addControl(new mapboxgl.NavigationControl({
       showCompass: true,
       showZoom: true,
@@ -65,6 +66,7 @@ function App() {
 
   return (
     <div className="App">
+      <div ref={mapContainer} className="map-container" />
       <DirectionsPlugin
         directionsLoaded={directionsLoaded}
         isAboutVisible={aboutVisibility}
@@ -81,7 +83,6 @@ function App() {
         isAboutVisible={aboutVisibility}
         aboutHook={setAboutVisibility}
       />
-      <div ref={mapContainer} className="map-container" />
     </div>
   )
 }
