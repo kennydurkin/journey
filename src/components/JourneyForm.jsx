@@ -7,7 +7,7 @@ import { cleanupPluginPosition } from "../util/helpers";
 import DurationSlider from "./DurationSlider";
 import DestinationType from "./DestinationType";
 import RoundTripCheckbox from "./RoundTrip";
-import Journey from "../journey";
+import Journey from "../util/journey";
 import "./JourneyForm.css";
 
 async function createAndPlotRoute(map, isOneWay, duration, destinationType) {

@@ -1,5 +1,5 @@
-import fetchIsochrone from "./network/fetch-isochrone";
-import fetchGeocoding from "./network/fetch-geocoding";
+import fetchIsochrone from "../network/fetch-isochrone";
+import fetchGeocoding from "../network/fetch-geocoding";
 import circle from "@turf/circle";
 import bbox from "@turf/bbox";
 
