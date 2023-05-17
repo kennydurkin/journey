@@ -10,7 +10,7 @@ const token = import.meta.env.VITE_MAPBOX_KEY;
 mapboxgl.accessToken = token;
 
 function App() {
-  const isFirstTimeVisitor = false;
+  const isFirstTimeVisitor = localStorage.getItem("hasVisited") ? false : true;
   // TODO: -122.2685 for desktop users once media queries start being added
   const initialLon = isFirstTimeVisitor ? -122.11 : -122.3275;
   const initialLat = isFirstTimeVisitor ? 47.36 : 47.5505;

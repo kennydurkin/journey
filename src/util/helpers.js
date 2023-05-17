@@ -28,7 +28,6 @@ export function initializePluginPosition() {
     // Necessary on mobile devices because the sidebar el, for some reason, uses the viewport bottom
     // when set to bottom: 0 rather than the true bottom zero point which is offset by address bars
     const addressBarHeight = document.querySelector('.map-container').offsetHeight - window.innerHeight;
-    console.log('addressbar height', addressBarHeight);
     const sidebarElHeight = document.querySelector('.journey-sidebar').offsetHeight;
     const bottomOffset = addressBarHeight + sidebarElHeight;
 
