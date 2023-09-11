@@ -1,12 +1,16 @@
+import type { Map } from "mapbox-gl";
+import type { FeatureCollection, Position } from "geojson";
+
 /**
  * Inspired by https://docs.mapbox.com/mapbox-gl-js/example/animate-ant-path/
- * @param {*} map The map instance
- * @param {*} contourRing An array of [lon, lat] pairs
+ * @param {React.RefObject<Map>} map The map instance
+ * @param {Position[]} contourRing An array of [lon, lat] pairs
  * @param {string|null} color
  */
-export default function addRingToMap(map, contourRing, color = null) {
+export default function addRingToMap(map: React.RefObject<Map>, contourRing: Position[], color: string | null = null) {
+    if (!map.current) return; // Refs will become null when the app unmounts
     const ringColor = color ?? '#1338BE';
-    const geojson = {
+    const geojson: FeatureCollection = {
         'type': 'FeatureCollection',
         'features': [
             {
@@ -70,10 +74,12 @@ export default function addRingToMap(map, contourRing, color = null) {
        
     let step = 0;
        
-    function animateDashArray(timestamp) {
+    function animateDashArray(timestamp: number) {
+        if (!map.current) return; // Refs will become null when the app unmounts
+
         // Update line-dasharray using the next value in dashArraySequence. The
         // divisor in the expression `timestamp / 50` controls the animation speed.
-        const newStep = parseInt(
+        const newStep = Math.floor(
             (timestamp / 50) % dashArraySequence.length
         );
         

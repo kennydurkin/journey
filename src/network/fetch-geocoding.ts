@@ -1,7 +1,7 @@
 const token = import.meta.env.VITE_MAPBOX_KEY;
 
 //https://api.mapbox.com/geocoding/v5/{endpoint}/{search_text}.json
-export default async (search_text, bbox, coordinate) => {
+export default async (search_text: string, bbox: string, coordinate: string[]) => {
     const urlBase = 'https://api.mapbox.com/geocoding/v5/mapbox.places/';
     const geocodingUrl =
         urlBase +

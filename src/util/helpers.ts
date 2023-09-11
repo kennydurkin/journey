@@ -1,4 +1,4 @@
-export function timeout(ms) {
+export function timeout(ms: number) {
     return new Promise(resolve => setTimeout(resolve, ms))
 };
 
@@ -48,7 +48,7 @@ export function initializePluginPosition() {
 }
 
 // Cosmetic, though it'd be nice if there were a cleaner way to do this
-export function toggleDestinationUI(shouldShow) {
+export function toggleDestinationUI(shouldShow: boolean) {
     const destination: HTMLElement|null = document.querySelector('.mapbox-directions-destination')
     const reverseSymbol: HTMLElement|null = document.querySelector('.directions-icon-reverse')
     if (!destination || !reverseSymbol) {

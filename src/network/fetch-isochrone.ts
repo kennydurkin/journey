@@ -1,7 +1,7 @@
 const token = import.meta.env.VITE_MAPBOX_KEY;
 
 //https://api.mapbox.com/isochrone/v1/{profile}/{coordinates}?{contours_minutes|contours_meters}
-export default async (position, duration) => {
+export default async (position: string[], duration: string) => {
     const urlBase = 'https://api.mapbox.com/isochrone/v1/';
     const generalization = 200;
     const isochroneUrl =

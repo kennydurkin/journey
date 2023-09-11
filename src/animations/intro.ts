@@ -1,6 +1,9 @@
+import type { Map } from "mapbox-gl";
 import { timeout } from "../util/helpers";
 
-async function zoomToCity(map) {
+async function zoomToCity(map: React.RefObject<Map>) {
+    if (!map.current) return; // Refs will become null when the app unmounts
+
     await timeout(2000);
     map.current.flyTo({
         // TODO: -122.2685 for desktop users once media queries start being added
@@ -11,7 +14,9 @@ async function zoomToCity(map) {
     });
 }
   
-async function rotateToBearing(map) {
+async function rotateToBearing(map: React.RefObject<Map>) {
+    if (!map.current) return; // Refs will become null when the app unmounts
+
     await timeout(7000);
     map.current.rotateTo(5, {
         duration: 2000,
@@ -22,7 +27,9 @@ async function rotateToBearing(map) {
     });
 }
 
-async function introAnimation(map) {
+async function introAnimation(map: React.RefObject<Map>) {
+    if (!map.current) return; // Refs will become null when the app unmounts
+
     if (!localStorage.getItem("hasVisited")) {
         localStorage.setItem("hasVisited", "true");
     }

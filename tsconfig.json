@@ -2,16 +2,17 @@
   "compilerOptions": {
     "allowJs": true, // allow a partial TypeScript and JavaScript codebase
     "jsx": "react-jsx", // use typescript to transpile jsx to js
-    "module": "es6", // specify module code generation
+    "module": "ESNext", // specify module code generation
     "moduleResolution": "Bundler",
     "outDir": "./dist/", // path to output directory
     "sourceMap": true, // allow sourcemap support
     "strict": true,
     "strictNullChecks": true, // enable strict null checks as a best practice
-    "target": "es5" // specify ECMAScript target version
+    "target": "ES6", // specify ECMAScript target version
+    "types": [ "vite/client" ],
   },
   "include": [
-    "./src/"
+    "./src/",
   ],
   "exclude": [
     "node_modules"
