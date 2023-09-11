@@ -1,4 +1,10 @@
-const DurationSlider = ({onChange, value}) => {
+type onChangeEvent = (e: React.FormEvent<HTMLInputElement>) => void;
+interface FormComponentProps {
+    onChange: onChangeEvent,
+    value: string
+}
+
+const DurationSlider = ({onChange, value}: FormComponentProps) => {
     return (
         <label>
             <input

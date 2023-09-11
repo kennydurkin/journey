@@ -1,12 +1,22 @@
 import "./RoundTrip.css";
 
-const toggleText = (duration, isOneWay) => {
-    const tripType = isOneWay ? 'One way' : 'Round trip'
-    const segmentDuration = isOneWay ? duration : Math.ceil(duration / 2);
+type onChangeEvent = (e: React.FormEvent<HTMLInputElement>) => void;
+interface FormComponentProps {
+    onChange: onChangeEvent,
+    value: boolean
+}
+
+interface RoundTripProps extends FormComponentProps {
+    duration: string
+}
+
+const toggleText = (duration: string, isOneWay: boolean) => {
+    const tripType = isOneWay ? 'One way' : 'Round trip';
+    const segmentDuration = isOneWay ? duration : Math.ceil(Number(duration) / 2);
     return `${tripType} (${segmentDuration}min each way)`;
 }
 
-const RoundTripCheckbox = ({value, onChange, duration}) => {
+const RoundTripCheckbox = ({value, onChange, duration}: RoundTripProps) => {
     return (
         <div className="toggle">
             <input 

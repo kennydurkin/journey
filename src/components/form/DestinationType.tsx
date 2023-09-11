@@ -1,4 +1,10 @@
-const DestinationType = ({onChange, value}) => {
+type onChangeEvent = (e: React.FormEvent<HTMLInputElement>) => void;
+interface FormComponentProps {
+    onChange: onChangeEvent,
+    value: string
+}
+
+const DestinationType = ({onChange, value}: FormComponentProps) => {
     return (
         <div className="radio-container">
             <label>
