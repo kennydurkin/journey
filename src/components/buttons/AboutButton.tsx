@@ -1,5 +1,10 @@
 import "./AboutButton.css";
 
+interface AboutButtonProps {
+    isAboutVisible: boolean,
+    aboutHook: React.Dispatch<React.SetStateAction<boolean>>
+}
+
 const AboutPopup = () => {
     const isMobile = true;
     const pitchText = isMobile ? "press two fingers down and move them up or down" : "right-click and drag the map upwards or downwards";
@@ -16,7 +21,7 @@ const AboutPopup = () => {
     )
 }
 
-const AboutButton = ({isAboutVisible, aboutHook}) => {
+const AboutButton = ({isAboutVisible, aboutHook}: AboutButtonProps) => {
     const handleClick = () => {
         aboutHook(!isAboutVisible);
     }

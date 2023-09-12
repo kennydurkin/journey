@@ -2,23 +2,26 @@ import fetchIsochrone from "../network/fetch-isochrone";
 import fetchGeocoding from "../network/fetch-geocoding";
 import circle from "@turf/circle";
 import bbox from "@turf/bbox";
+import { LngLatLike } from "mapbox-gl";
+import { Feature, LineString, Position, Point } from "geojson";
 
 export default class Journey {
-    // These get determined in the constructor
-    originPoint; // [Lon, lat]
-    isOneWay; // true/false
-    idealDuration; // Number, in minutes
-    idealRange; // Number, in minutes
-    poiType; // String
+    originPoint: LngLatLike;
+    isOneWay: boolean;
+    idealDuration: number;
+    idealRange: number;
+    poiType: string;
     
     // These get determined later on
-    contours = []; // GeoJSON Feature[]
-    bearingPoint = []; // [Lon, lat]
-    pois = []; // GeoJSON Feature[]
-    destinationPoi = []; // GeoJSON Feature
-    destinationPoint = []; // [Lon, lat]
+    contours?: Feature<LineString>[]; // GeoJSON Feature[]
+    contourRing?: Position[];
+    bearingPoint?: Position; // [Lon, lat]
+    pois?: Feature<Point>[]; // GeoJSON Feature[]
+    destinationPoi?: Feature<Point>; // GeoJSON Feature
+    destinationPoint?: Position; // [Lon, lat]
 
-    constructor(originPoint, isOneWay, idealDuration, poiType) {
+
+    constructor(originPoint: LngLatLike, isOneWay: boolean, idealDuration: number, poiType: string) {
         this.originPoint = originPoint;
         this.isOneWay = isOneWay;
         this.idealDuration = idealDuration;
@@ -42,27 +45,30 @@ export default class Journey {
     async getContours() {
         const results = await fetchIsochrone(
             this.originPoint,
-            this.idealRange
+            this.idealRange.toString()
         );
+
         return results.features;
     }
 
     async getPois() {
-        const testBbox = bbox(
+        if (!this.bearingPoint) return;
+        const boundingBox = bbox(
             circle(this.bearingPoint, 1, {
             units:'miles'
             })
         );
 
         if (import.meta.env.DEV) {
-            console.debug(`Bbox debugging: (${testBbox.join(',')})`);
+            console.debug(`Bbox debugging: (${boundingBox.join(',')})`);
         }
 
         const results = await fetchGeocoding(
             this.poiType,
-            testBbox,
+            boundingBox,
             this.bearingPoint,
         );
+
         return results.features;
     }
 
@@ -70,6 +76,7 @@ export default class Journey {
      * @returns [Lon, Lat]
      */
     pickCoordinate() {
+        if (!this.contours) return; // hm
         let coordinate;
         const targetContour = this.contours[0]; // TODO: grab the element with a properties.contour value of this.idealRange
         const ringCoords = targetContour.geometry.coordinates; // Array of [Lon,Lat]s
@@ -92,11 +99,12 @@ export default class Journey {
      *    - square/circle around candidate points consists of at least Y% points within the target contour
      * @param {number[]} coordinate 
      */
-    verifyCoordinate(coordinate) {
+    verifyCoordinate(coordinate: number[]) {
         return true;
     }
 
     pickAddress() {
+        if (!this.pois) return;
         // Step one: polygonize the contour LineStrings
         // Step two: use `mask` to treat the smaller LineString as a hole in the target LineString
         // Step three: filter the array to only those that pass pointsWithinPolygon
@@ -107,12 +115,12 @@ export default class Journey {
       
         // If there were none that survived the filter....we can just return the first result for now
         if (!filtered.length) {
-          return pointsOfInterest[0];
+          return this.pois[0].geometry.coordinates;
         }
       
         const randomIndex = Math.floor(Math.random() * (filtered.length - 1));
-        // console.log('Randomly selecting element #', randomIndex, 'of this array', filtered);
         this.destinationPoi = filtered[randomIndex];
+
         return this.destinationPoi.geometry.coordinates;
     }
 }

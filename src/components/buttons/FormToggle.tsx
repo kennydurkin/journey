@@ -1,4 +1,9 @@
-const FormToggle = ({isFormVisible, visibilityHook}) => {
+interface FormComponentProps {
+    visibilityHook: React.Dispatch<React.SetStateAction<boolean>>,
+    isFormVisible: boolean
+}
+
+const FormToggle = ({isFormVisible, visibilityHook}: FormComponentProps) => {
     return (
         <button className="menu-button" onClick={() => visibilityHook(!isFormVisible)}>
             <svg viewBox="-48 0 200 90" width="50" height="50">

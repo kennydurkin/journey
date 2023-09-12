@@ -1,11 +1,20 @@
 import { useState, useEffect, useRef } from "react";
+import type { Map } from "mapbox-gl";
 
-const RotateToggle = ({map}) => {
+interface RotateProps {
+    map: React.RefObject<Map>,
+}
+
+const RotateToggle = ({map}: RotateProps) => {
     const [isRotationOn, setRotation] = useState(false);
-    const animationFrameId = useRef(undefined);
+    const animationFrameId: React.MutableRefObject<number> = useRef(0);
 
-    function rotateCamera(timestamp) {
-        map.current.rotateTo((map.current.getBearing() + 0.2) % 360, { duration: 0 });
+    function rotateCamera(timestamp: number) {
+        if (!map.current) return;
+        map.current.rotateTo(
+            (map.current.getBearing() + 0.2) % 360,
+            { duration: 0 }
+        );
         animationFrameId.current = requestAnimationFrame(rotateCamera);
     }
 

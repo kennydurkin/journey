@@ -4,7 +4,8 @@ import App from './App';
 import "mapbox-gl/dist/mapbox-gl.css";
 import './assets/index.css';
 
-ReactDOM.createRoot(document.getElementById('root')).render(
+const rootElement = document.getElementById('root');
+rootElement && ReactDOM.createRoot(rootElement).render(
   <React.StrictMode>
     <App />
   </React.StrictMode>,
